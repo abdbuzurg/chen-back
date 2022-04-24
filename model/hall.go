@@ -1,9 +1,7 @@
 package model
 
-import "gorm.io/gorm"
-
 type Hall struct {
-	gorm.Model
+	OwnModel
 	Name     string `json:"namme"`
 	BranchID uint
 

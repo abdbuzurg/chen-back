@@ -1,9 +1,7 @@
 package model
 
-import "gorm.io/gorm"
-
 type Item struct {
-	gorm.Model
+	OwnModel
 	Price float32 `json:"price"`
 	Name  string  `json:"name"`
 

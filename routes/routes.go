@@ -41,18 +41,19 @@ func RunRoutes() {
 
 func attachRoutes(r *gin.Engine) {
 	authEndpoints(r)
+	organizationCRUDEndpoints(r)
 }
 
 func authEndpoints(r *gin.Engine) {
 	auth := r.Group("/auth")
 	auth.POST("/register", controller.Register)
-	auth.POST("/login", controller.Login)
+	auth.GET("/login", controller.Login)
 }
 
-func organizationCRUD(r *gin.Engine) {
+func organizationCRUDEndpoints(r *gin.Engine) {
 	org := r.Group("/organization")
 	org.GET("/:id", controller.OrgFind)
-	org.POST("/", controller.OrgCreate)
-	org.PATCH("/:id", controller.OrgUpdate)
+	org.POST("", controller.OrgCreate)
+	org.PUT("/:id", controller.OrgUpdate)
 	org.DELETE("/:id", controller.OrgDelete)
 }

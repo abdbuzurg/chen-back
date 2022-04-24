@@ -12,7 +12,7 @@ import (
 
 func Register(c *gin.Context) {
 	var dataForRegistration model.RegisterData
-	if err := c.BindJSON(&dataForRegistration); err != nil {
+	if err := c.ShouldBind(&dataForRegistration); err != nil {
 		response.FormatResponse(c, http.StatusBadRequest, "Invalid Data Format", false)
 		return
 	}
@@ -28,7 +28,7 @@ func Register(c *gin.Context) {
 
 func Login(c *gin.Context) {
 	var dataForLogin model.LoginData
-	if err := c.BindJSON(&dataForLogin); err != nil {
+	if err := c.ShouldBind(&dataForLogin); err != nil {
 		response.FormatResponse(c, http.StatusBadRequest, "Invalid Data Format", false)
 		return
 	}

@@ -6,13 +6,12 @@ import (
 )
 
 func OrgFind(id int) (model.Organization, error) {
-
 	return repository.OrgFindById(id)
 }
 func OrgCreate(data model.OrganizationData) error {
 	return repository.OrgCreate(data)
 }
-func OrgUpdate(id int, data model.OrganizationData) (model.Organization, error) {
+func OrgUpdate(id int, data model.OrganizationData) error {
 	return repository.OrgUpdate(id, data)
 }
 func OrgDelete(id int) error {

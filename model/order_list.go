@@ -1,9 +1,7 @@
 package model
 
-import "gorm.io/gorm"
-
 type OrderList struct {
-	gorm.Model
+	OwnModel
 	Count   uint
 	OrderID uint
 	ItemID  uint

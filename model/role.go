@@ -1,9 +1,7 @@
 package model
 
-import "gorm.io/gorm"
-
 type Role struct {
-	gorm.Model
+	OwnModel
 	Name string `json:"name"`
 
 	// one to many with USER

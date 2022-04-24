@@ -1,20 +1,18 @@
 package model
 
-import "gorm.io/gorm"
-
 type Organization struct {
-	gorm.Model
+	OwnModel
 	Name     string `json:"name"`
-	IsActive bool   `json:"isActive"`
+	IsActive bool   `json:"is_active"`
 
 	//One to Many
-	Branches []Branch
+	Branches []Branch `json:"-"`
 
 	//Many to Many
-	Users []User `gorm:"many2many:organizations_users;"`
+	Users []User `json:"-" gorm:"many2many:organizations_users;"`
 }
 
 type OrganizationData struct {
-	Name     string `json:"name"`
-	IsActive bool   `json:"isActive"`
+	Name     string `json:"name" binding:"required"`
+	IsActive bool   `json:"is_active" binding:"required"`
 }

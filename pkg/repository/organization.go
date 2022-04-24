@@ -4,6 +4,7 @@ import (
 	"chen/db"
 	"chen/model"
 	"errors"
+	"time"
 )
 
 func OrgFindById(id int) (model.Organization, error) {
@@ -32,22 +33,23 @@ func OrgCreate(data model.OrganizationData) error {
 
 	return nil
 }
-func OrgUpdate(id int, data model.OrganizationData) (model.Organization, error) {
+func OrgUpdate(id int, data model.OrganizationData) error {
 	db := db.GetSQLiteConnection()
 
 	var org model.Organization
 	result := db.First(&org, "id = ?", id)
 	if result.Error != nil {
-		return model.Organization{}, result.Error
+		return result.Error
 	}
 
-	result = db.Model(&org).Updates(data)
-	if result != nil {
-		return model.Organization{}, result.Error
+	result = db.Model(org).Updates(data).Update("updated_at", time.Now())
+	if result.Error != nil {
+		return result.Error
 	}
 
-	return org, nil
+	return nil
 }
+
 func OrgDelete(id int) error {
 	db := db.GetSQLiteConnection()
 	return db.Delete(&model.Organization{}, id).Error

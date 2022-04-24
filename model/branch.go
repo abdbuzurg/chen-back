@@ -1,12 +1,10 @@
 package model
 
-import "gorm.io/gorm"
-
 type Branch struct {
-	gorm.Model
+	OwnModel
 	OrganizationID uint
 	Name           string `json:"name"`
-	IsActive       string `json:"isActive"`
+	IsActive       string `json:"isActive" gorm:"column:isActive"`
 
 	//Many to Many
 	Users []User `gorm:"many2many:branches_users;"`

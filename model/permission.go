@@ -1,9 +1,7 @@
 package model
 
-import "gorm.io/gorm"
-
 type Permission struct {
-	gorm.Model
+	OwnModel
 	Title       string `json:"title"`
 	Description string `json:"description"`
 }

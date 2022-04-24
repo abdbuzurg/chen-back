@@ -10,12 +10,14 @@ func UserCreate(registrationData model.RegisterData) error {
 	user := model.User{
 		Username:  registrationData.Username,
 		Password:  registrationData.Password,
-		FirstName: registrationData.FirstName,
-		LastName:  registrationData.LastName,
+		Firstname: registrationData.Firstname,
+		Lastname:  registrationData.Lastname,
 		RoleID:    registrationData.RoleID,
 		IsActive:  true,
 	}
+
 	result := db.Create(&user)
+
 	if result.Error != nil {
 		return result.Error
 	}
