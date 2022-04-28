@@ -1,15 +1,43 @@
 package routes
 
 import (
-	"chen/pkg/controller"
 	"fmt"
 	"os"
 
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
+	"gorm.io/gorm"
 )
 
-func serverListen(r *gin.Engine) {
+type Server struct {
+	DB     *gorm.DB
+	Router *gin.Engine
+}
+
+func NewServer(db *gorm.DB) Server {
+	r := gin.Default()
+
+	r.Use(cors.Default())
+	r.Use(gin.Recovery())
+
+	server := Server{
+		DB:     db,
+		Router: r,
+	}
+
+	server.registerRoutes()
+
+	return server
+}
+
+func (s *Server) registerRoutes() {
+	s.AuthEndpoints()
+	s.OrganizationCRUDEndpoints()
+	s.BranchCRUDEndpoints()
+	s.HallCRUDEndpoints()
+}
+
+func (s *Server) ServerListen() {
 	var port, host string
 
 	port, exists := os.LookupEnv("PORT")
@@ -22,38 +50,9 @@ func serverListen(r *gin.Engine) {
 		host = "localhost"
 	}
 
-	err := r.Run(fmt.Sprintf("%s:%s", host, port))
+	err := s.Router.Run(fmt.Sprintf("%s:%s", host, port))
 	if err != nil {
 		fmt.Println(err.Error())
 		panic("PIZDEC")
 	}
-}
-
-func RunRoutes() {
-	r := gin.Default()
-
-	r.Use(cors.Default())
-	r.Use(gin.Recovery())
-
-	attachRoutes(r)
-	serverListen(r)
-}
-
-func attachRoutes(r *gin.Engine) {
-	authEndpoints(r)
-	organizationCRUDEndpoints(r)
-}
-
-func authEndpoints(r *gin.Engine) {
-	auth := r.Group("/auth")
-	auth.POST("/register", controller.Register)
-	auth.GET("/login", controller.Login)
-}
-
-func organizationCRUDEndpoints(r *gin.Engine) {
-	org := r.Group("/organization")
-	org.GET("/:id", controller.OrgFind)
-	org.POST("", controller.OrgCreate)
-	org.PUT("/:id", controller.OrgUpdate)
-	org.DELETE("/:id", controller.OrgDelete)
 }

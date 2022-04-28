@@ -1,12 +1,27 @@
 package repository
 
 import (
-	"chen/db"
 	"chen/model"
+
+	"gorm.io/gorm"
 )
 
-func UserCreate(registrationData model.RegisterData) error {
-	db := db.GetSQLiteConnection()
+type AuthenticationRepository interface {
+	Create(registrationData model.RegisterData) error
+	UserFindByUsername(username string) (model.User, error)
+}
+
+type authenticationRepository struct {
+	db *gorm.DB
+}
+
+func NewAuthenticationRepository(db *gorm.DB) AuthenticationRepository {
+	return authenticationRepository{
+		db: db,
+	}
+}
+
+func (ar authenticationRepository) Create(registrationData model.RegisterData) error {
 	user := model.User{
 		Username:  registrationData.Username,
 		Password:  registrationData.Password,
@@ -16,7 +31,7 @@ func UserCreate(registrationData model.RegisterData) error {
 		IsActive:  true,
 	}
 
-	result := db.Create(&user)
+	result := ar.db.Create(&user)
 
 	if result.Error != nil {
 		return result.Error
@@ -25,11 +40,9 @@ func UserCreate(registrationData model.RegisterData) error {
 	return nil
 }
 
-func UserFindByUsername(username string) (model.User, error) {
-	db := db.GetSQLiteConnection()
-
+func (ar authenticationRepository) UserFindByUsername(username string) (model.User, error) {
 	var user model.User
-	result := db.First(&user, "username = ?", username)
+	result := ar.db.First(&user, "username = ?", username)
 	if result.Error != nil {
 		return model.User{}, result.Error
 	}

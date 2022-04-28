@@ -4,21 +4,48 @@ import (
 	"chen/model"
 	"chen/pkg/service"
 	"chen/utils/response"
-	"fmt"
 	"net/http"
 	"strconv"
 
 	"github.com/gin-gonic/gin"
 )
 
-func OrgFind(c *gin.Context) {
+type OrganizationController interface {
+	FindAll(c *gin.Context)
+	FindById(c *gin.Context)
+	Create(c *gin.Context)
+	Update(c *gin.Context)
+	Delete(c *gin.Context)
+}
+
+type organizationController struct {
+	organizationService service.OrganizationService
+}
+
+func NewOrganizationController(service service.OrganizationService) OrganizationController {
+	return organizationController{
+		organizationService: service,
+	}
+}
+
+func (oc organizationController) FindAll(c *gin.Context) {
+	orgs, err := oc.organizationService.FindAll()
+	if err != nil {
+		response.FormatResponse(c, http.StatusInternalServerError, "could not fetch entries", false)
+		return
+	}
+
+	response.FormatResponse(c, http.StatusOK, orgs, true)
+}
+
+func (oc organizationController) FindById(c *gin.Context) {
 	idRaw := c.Param("id")
 	id, err := strconv.Atoi(idRaw)
 	if err != nil {
 		response.FormatResponse(c, http.StatusBadRequest, "Invalid parameters", false)
 		return
 	}
-	org, err := service.OrgFind(id)
+	org, err := oc.organizationService.FindById(id)
 	if err != nil {
 		response.FormatResponse(c, http.StatusInternalServerError, err.Error(), false)
 		return
@@ -27,14 +54,13 @@ func OrgFind(c *gin.Context) {
 	response.FormatResponse(c, http.StatusOK, org, true)
 }
 
-func OrgCreate(c *gin.Context) {
+func (oc organizationController) Create(c *gin.Context) {
 	var dataForCreatingNewOrg model.OrganizationData
-	if err := c.ShouldBind(&dataForCreatingNewOrg); err != nil {
+	if err := c.ShouldBindJSON(&dataForCreatingNewOrg); err != nil {
 		response.FormatResponse(c, http.StatusBadRequest, "Invalid Body", false)
 		return
 	}
-	fmt.Println(dataForCreatingNewOrg)
-	err := service.OrgCreate(dataForCreatingNewOrg)
+	err := oc.organizationService.Create(dataForCreatingNewOrg)
 
 	if err != nil {
 		response.FormatResponse(c, http.StatusInternalServerError, "Could not create ORG", false)
@@ -44,7 +70,7 @@ func OrgCreate(c *gin.Context) {
 	response.FormatResponse(c, http.StatusOK, "New Org is created", true)
 }
 
-func OrgUpdate(c *gin.Context) {
+func (oc organizationController) Update(c *gin.Context) {
 	idRaw := c.Param("id")
 	id, err := strconv.Atoi(idRaw)
 	if err != nil {
@@ -53,11 +79,11 @@ func OrgUpdate(c *gin.Context) {
 	}
 
 	var dataForUpdaingOrgInfo model.OrganizationData
-	if err := c.ShouldBind(&dataForUpdaingOrgInfo); err != nil {
+	if err := c.ShouldBindJSON(&dataForUpdaingOrgInfo); err != nil {
 		response.FormatResponse(c, http.StatusBadRequest, "Invalid Body", false)
 		return
 	}
-	err = service.OrgUpdate(id, dataForUpdaingOrgInfo)
+	err = oc.organizationService.Update(id, dataForUpdaingOrgInfo)
 	if err != nil {
 		response.FormatResponse(c, http.StatusInternalServerError, "Cannot update Org Info", false)
 		return
@@ -65,7 +91,7 @@ func OrgUpdate(c *gin.Context) {
 
 	response.FormatResponse(c, http.StatusOK, "Info updated successfully", true)
 }
-func OrgDelete(c *gin.Context) {
+func (oc organizationController) Delete(c *gin.Context) {
 
 	idRaw := c.Param("id")
 	id, err := strconv.Atoi(idRaw)
@@ -74,7 +100,7 @@ func OrgDelete(c *gin.Context) {
 		return
 	}
 
-	err = service.OrgDelete(id)
+	err = oc.organizationService.Delete(id)
 	if err != nil {
 		response.FormatResponse(c, http.StatusInternalServerError, "Could not delete org", false)
 	}

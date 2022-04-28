@@ -10,14 +10,29 @@ import (
 	"chen/utils/response"
 )
 
-func Register(c *gin.Context) {
+type AuthentificationController interface {
+	Register(c *gin.Context)
+	Login(c *gin.Context)
+}
+
+type authentificationController struct {
+	authenticationService service.AuthenticationService
+}
+
+func NewAuthenticationController(service service.AuthenticationService) AuthentificationController {
+	return authentificationController{
+		authenticationService: service,
+	}
+}
+
+func (ac authentificationController) Register(c *gin.Context) {
 	var dataForRegistration model.RegisterData
-	if err := c.ShouldBind(&dataForRegistration); err != nil {
+	if err := c.ShouldBindJSON(&dataForRegistration); err != nil {
 		response.FormatResponse(c, http.StatusBadRequest, "Invalid Data Format", false)
 		return
 	}
 
-	err := service.AuthRegiseter(dataForRegistration)
+	err := ac.authenticationService.AuthRegister(dataForRegistration)
 	if err != nil {
 		response.FormatResponse(c, http.StatusInternalServerError, "Server Cannot handle your requests", false)
 		return
@@ -26,14 +41,14 @@ func Register(c *gin.Context) {
 	response.FormatResponse(c, http.StatusOK, "You have been registered", true)
 }
 
-func Login(c *gin.Context) {
-	var dataForLogin model.LoginData
-	if err := c.ShouldBind(&dataForLogin); err != nil {
+func (ac authentificationController) Login(c *gin.Context) {
+	dataForLogin := model.LoginData{}
+	if err := c.ShouldBindJSON(&dataForLogin); err != nil {
 		response.FormatResponse(c, http.StatusBadRequest, "Invalid Data Format", false)
 		return
 	}
 
-	message, err := service.AuthLogin(dataForLogin)
+	message, err := ac.authenticationService.AuthLogin(dataForLogin)
 	if err != nil {
 		response.FormatResponse(c, http.StatusInternalServerError, message, false)
 		return

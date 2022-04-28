@@ -5,15 +5,37 @@ import (
 	"chen/pkg/repository"
 )
 
-func OrgFind(id int) (model.Organization, error) {
-	return repository.OrgFindById(id)
+type OrganizationService interface {
+	FindAll() ([]model.Organization, error)
+	FindById(id int) (model.Organization, error)
+	Create(data model.OrganizationData) error
+	Update(id int, data model.OrganizationData) error
+	Delete(id int) error
 }
-func OrgCreate(data model.OrganizationData) error {
-	return repository.OrgCreate(data)
+
+type organizationService struct {
+	organizationRepo repository.OrganizationRepo
 }
-func OrgUpdate(id int, data model.OrganizationData) error {
-	return repository.OrgUpdate(id, data)
+
+func NewOrganizationService(repo repository.OrganizationRepo) OrganizationService {
+	return organizationService{
+		organizationRepo: repo,
+	}
 }
-func OrgDelete(id int) error {
-	return repository.OrgDelete(id)
+
+func (os organizationService) FindAll() ([]model.Organization, error) {
+	return os.organizationRepo.FindAll()
+}
+
+func (os organizationService) FindById(id int) (model.Organization, error) {
+	return os.organizationRepo.FindById(id)
+}
+func (os organizationService) Create(data model.OrganizationData) error {
+	return os.organizationRepo.Create(data)
+}
+func (os organizationService) Update(id int, data model.OrganizationData) error {
+	return os.organizationRepo.Update(id, data)
+}
+func (os organizationService) Delete(id int) error {
+	return os.organizationRepo.Delete(id)
 }

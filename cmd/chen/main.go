@@ -7,5 +7,6 @@ import (
 
 func main() {
 	db.OpenSQLiteConnection()
-	routes.RunRoutes()
+	server := routes.NewServer(db.GetSQLiteConnection())
+	server.ServerListen()
 }
