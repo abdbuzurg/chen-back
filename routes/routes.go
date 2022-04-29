@@ -35,6 +35,7 @@ func (s *Server) registerRoutes() {
 	s.OrganizationCRUDEndpoints()
 	s.BranchCRUDEndpoints()
 	s.HallCRUDEndpoints()
+	s.TableCRUDEndpoint()
 }
 
 func (s *Server) ServerListen() {

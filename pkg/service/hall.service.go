@@ -2,14 +2,15 @@ package service
 
 import (
 	"chen/model"
+	"chen/pkg/dto"
 	"chen/pkg/repository"
 )
 
 type HallService interface {
 	FindAll() ([]model.Hall, error)
 	FindById(id int) (model.Hall, error)
-	Create(data model.HallCreateData) error
-	Update(id int, data model.HallUpdateData) error
+	Create(data dto.HallCreateDTO) error
+	Update(id int, data dto.HallUpdateDTO) error
 	Delete(id int) error
 }
 
@@ -31,11 +32,11 @@ func (hs hallService) FindById(id int) (model.Hall, error) {
 	return hs.hallRepository.FindById(id)
 }
 
-func (hs hallService) Create(data model.HallCreateData) error {
+func (hs hallService) Create(data dto.HallCreateDTO) error {
 	return hs.hallRepository.Create(data)
 }
 
-func (hs hallService) Update(id int, data model.HallUpdateData) error {
+func (hs hallService) Update(id int, data dto.HallUpdateDTO) error {
 	return hs.hallRepository.Update(id, data)
 }
 

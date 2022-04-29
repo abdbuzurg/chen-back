@@ -2,6 +2,7 @@ package repository
 
 import (
 	"chen/model"
+	"chen/pkg/dto"
 	"time"
 
 	"gorm.io/gorm"
@@ -10,8 +11,8 @@ import (
 type BranchRepository interface {
 	FindAll() ([]model.Branch, error)
 	FindById(id int) (model.Branch, error)
-	Create(data model.BranchCreateData) error
-	Update(id int, data model.BranchUpdateData) error
+	Create(data dto.BranchCreateDTO) error
+	Update(id int, data dto.BranchUpdateDTO) error
 	Delete(id int) error
 }
 
@@ -42,7 +43,7 @@ func (br branchRepositry) FindById(id int) (model.Branch, error) {
 	return branch, nil
 }
 
-func (br branchRepositry) Create(data model.BranchCreateData) error {
+func (br branchRepositry) Create(data dto.BranchCreateDTO) error {
 
 	newBranch := &model.Branch{
 		OrganizationID: data.OrganizationID,
@@ -55,7 +56,7 @@ func (br branchRepositry) Create(data model.BranchCreateData) error {
 	return result.Error
 }
 
-func (br branchRepositry) Update(id int, data model.BranchUpdateData) error {
+func (br branchRepositry) Update(id int, data dto.BranchUpdateDTO) error {
 	branch := model.Branch{}
 	result := br.db.First(branch, "id = ?", id)
 	if result.Error != nil {

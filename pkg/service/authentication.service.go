@@ -1,7 +1,7 @@
 package service
 
 import (
-	"chen/model"
+	"chen/pkg/dto"
 	"chen/pkg/repository"
 	"chen/utils/token"
 
@@ -9,8 +9,8 @@ import (
 )
 
 type AuthenticationService interface {
-	AuthRegister(registrationData model.RegisterData) error
-	AuthLogin(loginData model.LoginData) (string, error)
+	AuthRegister(registrationData dto.AuthenticationRegisterDTO) error
+	AuthLogin(loginData dto.AuthenticationLoginDTO) (string, error)
 }
 
 type authenticationService struct {
@@ -23,7 +23,7 @@ func NewAuthenticationService(repo repository.AuthenticationRepository) Authenti
 	}
 }
 
-func (as authenticationService) AuthRegister(registrationData model.RegisterData) error {
+func (as authenticationService) AuthRegister(registrationData dto.AuthenticationRegisterDTO) error {
 	password, err := bcrypt.GenerateFromPassword([]byte(registrationData.Password), bcrypt.DefaultCost)
 	if err != nil {
 		return err
@@ -40,7 +40,7 @@ func (as authenticationService) AuthRegister(registrationData model.RegisterData
 }
 
 // CHANGE RETURN TO VALID JWT TOKEN
-func (as authenticationService) AuthLogin(loginData model.LoginData) (string, error) {
+func (as authenticationService) AuthLogin(loginData dto.AuthenticationLoginDTO) (string, error) {
 	user, err := as.authenticationRepository.UserFindByUsername(loginData.Username)
 	if err != nil {
 		return "User does not exist", err

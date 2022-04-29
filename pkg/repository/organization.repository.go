@@ -2,6 +2,7 @@ package repository
 
 import (
 	"chen/model"
+	"chen/pkg/dto"
 	"errors"
 	"time"
 
@@ -11,8 +12,8 @@ import (
 type OrganizationRepo interface {
 	FindAll() ([]model.Organization, error)
 	FindById(id int) (model.Organization, error)
-	Create(data model.OrganizationData) error
-	Update(id int, data model.OrganizationData) error
+	Create(data dto.OrganizationDTO) error
+	Update(id int, data dto.OrganizationDTO) error
 	Delete(id int) error
 }
 
@@ -43,7 +44,7 @@ func (or organizationRepo) FindById(id int) (model.Organization, error) {
 
 	return org, nil
 }
-func (or organizationRepo) Create(data model.OrganizationData) error {
+func (or organizationRepo) Create(data dto.OrganizationDTO) error {
 
 	newOrg := &model.Organization{
 		IsActive: data.IsActive,
@@ -57,7 +58,7 @@ func (or organizationRepo) Create(data model.OrganizationData) error {
 
 	return nil
 }
-func (or organizationRepo) Update(id int, data model.OrganizationData) error {
+func (or organizationRepo) Update(id int, data dto.OrganizationDTO) error {
 
 	var org model.Organization
 	result := or.db.First(&org, "id = ?", id)

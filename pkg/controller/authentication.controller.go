@@ -5,7 +5,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 
-	"chen/model"
+	"chen/pkg/dto"
 	"chen/pkg/service"
 	"chen/utils/response"
 )
@@ -26,7 +26,7 @@ func NewAuthenticationController(service service.AuthenticationService) Authenti
 }
 
 func (ac authentificationController) Register(c *gin.Context) {
-	var dataForRegistration model.RegisterData
+	var dataForRegistration dto.AuthenticationRegisterDTO
 	if err := c.ShouldBindJSON(&dataForRegistration); err != nil {
 		response.FormatResponse(c, http.StatusBadRequest, "Invalid Data Format", false)
 		return
@@ -42,7 +42,7 @@ func (ac authentificationController) Register(c *gin.Context) {
 }
 
 func (ac authentificationController) Login(c *gin.Context) {
-	dataForLogin := model.LoginData{}
+	dataForLogin := dto.AuthenticationLoginDTO{}
 	if err := c.ShouldBindJSON(&dataForLogin); err != nil {
 		response.FormatResponse(c, http.StatusBadRequest, "Invalid Data Format", false)
 		return

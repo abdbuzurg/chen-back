@@ -1,7 +1,7 @@
 package controller
 
 import (
-	"chen/model"
+	"chen/pkg/dto"
 	"chen/pkg/service"
 	"chen/utils/response"
 	"net/http"
@@ -10,7 +10,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-type HallController interface {
+type BranchController interface {
 	FindAll(c *gin.Context)
 	FindById(c *gin.Context)
 	Create(c *gin.Context)
@@ -18,27 +18,27 @@ type HallController interface {
 	Delete(c *gin.Context)
 }
 
-type hallController struct {
-	hallService service.HallService
+type branchController struct {
+	branchService service.BranchService
 }
 
-func NewHallController(service service.HallService) HallController {
-	return hallController{
-		hallService: service,
+func NewBranchController(service service.BranchService) BranchController {
+	return branchController{
+		branchService: service,
 	}
 }
 
-func (hc hallController) FindAll(c *gin.Context) {
-	halls, err := hc.hallService.FindAll()
+func (bc branchController) FindAll(c *gin.Context) {
+	branches, err := bc.branchService.FindAll()
 	if err != nil {
 		response.FormatResponse(c, http.StatusInternalServerError, "Could not get branches", false)
 		return
 	}
 
-	response.FormatResponse(c, http.StatusOK, halls, true)
+	response.FormatResponse(c, http.StatusOK, branches, true)
 }
 
-func (hc hallController) FindById(c *gin.Context) {
+func (bc branchController) FindById(c *gin.Context) {
 	idRaw := c.Param("id")
 	id, err := strconv.Atoi(idRaw)
 	if err != nil {
@@ -46,23 +46,23 @@ func (hc hallController) FindById(c *gin.Context) {
 		return
 	}
 
-	hall, err := hc.hallService.FindById(id)
+	branch, err := bc.branchService.FindById(id)
 	if err != nil {
-		response.FormatResponse(c, http.StatusInternalServerError, "Could not find", false)
+		response.FormatResponse(c, http.StatusInternalServerError, "Could not find Branch", false)
 		return
 	}
 
-	response.FormatResponse(c, http.StatusOK, hall, true)
+	response.FormatResponse(c, http.StatusOK, branch, true)
 }
 
-func (hc hallController) Create(c *gin.Context) {
-	dataForNewHall := model.HallCreateData{}
-	if err := c.ShouldBindJSON(&dataForNewHall); err != nil {
-		response.FormatResponse(c, http.StatusBadRequest, "Invalid body", false)
+func (bc branchController) Create(c *gin.Context) {
+	dataForNewBranch := dto.BranchCreateDTO{}
+	if err := c.ShouldBindJSON(&dataForNewBranch); err != nil {
+		response.FormatResponse(c, http.StatusBadRequest, "Invalid Body", false)
 		return
 	}
 
-	err := hc.hallService.Create(dataForNewHall)
+	err := bc.branchService.Create(dataForNewBranch)
 	if err != nil {
 		response.FormatResponse(c, http.StatusInternalServerError, "Could not create", false)
 		return
@@ -71,7 +71,7 @@ func (hc hallController) Create(c *gin.Context) {
 	response.FormatResponse(c, http.StatusOK, "Created", true)
 }
 
-func (hc hallController) Update(c *gin.Context) {
+func (bc branchController) Update(c *gin.Context) {
 	idRaw := c.Param("id")
 	id, err := strconv.Atoi(idRaw)
 	if err != nil {
@@ -79,13 +79,13 @@ func (hc hallController) Update(c *gin.Context) {
 		return
 	}
 
-	dataToUpdateHall := model.HallUpdateData{}
-	if err := c.ShouldBindJSON(&dataToUpdateHall); err != nil {
-		response.FormatResponse(c, http.StatusBadRequest, "Invalid body", false)
+	dataForNewBranch := dto.BranchUpdateDTO{}
+	if err := c.ShouldBindJSON(&dataForNewBranch); err != nil {
+		response.FormatResponse(c, http.StatusBadRequest, "Invalid Body", false)
 		return
 	}
 
-	err = hc.hallService.Update(id, dataToUpdateHall)
+	err = bc.branchService.Update(id, dataForNewBranch)
 	if err != nil {
 		response.FormatResponse(c, http.StatusInternalServerError, "Could not update", false)
 		return
@@ -94,7 +94,7 @@ func (hc hallController) Update(c *gin.Context) {
 	response.FormatResponse(c, http.StatusOK, "Updated", true)
 }
 
-func (hc hallController) Delete(c *gin.Context) {
+func (bc branchController) Delete(c *gin.Context) {
 	idRaw := c.Param("id")
 	id, err := strconv.Atoi(idRaw)
 	if err != nil {
@@ -102,11 +102,10 @@ func (hc hallController) Delete(c *gin.Context) {
 		return
 	}
 
-	err = hc.hallService.Delete(id)
+	err = bc.branchService.Delete(id)
 	if err != nil {
 		response.FormatResponse(c, http.StatusInternalServerError, "Could not delete", false)
 		return
 	}
-
 	response.FormatResponse(c, http.StatusOK, "Deleted", true)
 }

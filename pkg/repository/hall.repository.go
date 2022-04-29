@@ -2,6 +2,7 @@ package repository
 
 import (
 	"chen/model"
+	"chen/pkg/dto"
 	"time"
 
 	"gorm.io/gorm"
@@ -10,8 +11,8 @@ import (
 type HallRepository interface {
 	FindAll() ([]model.Hall, error)
 	FindById(id int) (model.Hall, error)
-	Create(data model.HallCreateData) error
-	Update(id int, data model.HallUpdateData) error
+	Create(data dto.HallCreateDTO) error
+	Update(id int, data dto.HallUpdateDTO) error
 	Delete(id int) error
 }
 
@@ -38,7 +39,7 @@ func (hr hallRepository) FindById(id int) (model.Hall, error) {
 	return hall, result.Error
 }
 
-func (hr hallRepository) Create(data model.HallCreateData) error {
+func (hr hallRepository) Create(data dto.HallCreateDTO) error {
 	hall := &model.Hall{
 		Name:     data.Name,
 		BranchID: data.BranchID,
@@ -49,7 +50,7 @@ func (hr hallRepository) Create(data model.HallCreateData) error {
 	return result.Error
 }
 
-func (hr hallRepository) Update(id int, data model.HallUpdateData) error {
+func (hr hallRepository) Update(id int, data dto.HallUpdateDTO) error {
 	hall := model.Hall{}
 	err := hr.db.First(&hall, "id = ?", id).Error
 	if err != nil {

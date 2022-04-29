@@ -1,17 +1,6 @@
-package model
+package dto
 
-type User struct {
-	OwnModel
-	Username  string `json:"username"`
-	Password  string
-	Firstname string `json:"firstname"`
-	Lastname  string `json:"lastname"`
-	RoleID    uint
-	IsActive  bool
-}
-
-// For Registration
-type RegisterData struct {
+type AuthenticationRegisterDTO struct {
 	Username  string `json:"username" binding:"required"`
 	Password  string `json:"password" binding:"required"`
 	Firstname string `json:"firstname" binding:"required"`
@@ -19,8 +8,7 @@ type RegisterData struct {
 	RoleID    uint   `json:"role_id" binding:"required"`
 }
 
-// For Login
-type LoginData struct {
+type AuthenticationLoginDTO struct {
 	Username string `json:"username" binding:"required"`
 	Password string `json:"password" binding:"required"`
 }

@@ -1,7 +1,7 @@
 package controller
 
 import (
-	"chen/model"
+	"chen/pkg/dto"
 	"chen/pkg/service"
 	"chen/utils/response"
 	"net/http"
@@ -55,7 +55,7 @@ func (oc organizationController) FindById(c *gin.Context) {
 }
 
 func (oc organizationController) Create(c *gin.Context) {
-	var dataForCreatingNewOrg model.OrganizationData
+	var dataForCreatingNewOrg dto.OrganizationDTO
 	if err := c.ShouldBindJSON(&dataForCreatingNewOrg); err != nil {
 		response.FormatResponse(c, http.StatusBadRequest, "Invalid Body", false)
 		return
@@ -78,7 +78,7 @@ func (oc organizationController) Update(c *gin.Context) {
 		return
 	}
 
-	var dataForUpdaingOrgInfo model.OrganizationData
+	var dataForUpdaingOrgInfo dto.OrganizationDTO
 	if err := c.ShouldBindJSON(&dataForUpdaingOrgInfo); err != nil {
 		response.FormatResponse(c, http.StatusBadRequest, "Invalid Body", false)
 		return
