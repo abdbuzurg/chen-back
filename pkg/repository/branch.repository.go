@@ -3,7 +3,6 @@ package repository
 import (
 	"chen/model"
 	"chen/pkg/dto"
-	"time"
 
 	"gorm.io/gorm"
 )
@@ -29,46 +28,32 @@ func NewBranchRepository(db *gorm.DB) BranchRepository {
 func (br branchRepositry) FindAll() ([]model.Branch, error) {
 	orgs := []model.Branch{}
 	err := br.db.Find(&orgs).Error
-
 	return orgs, err
 }
 
 func (br branchRepositry) FindById(id int) (model.Branch, error) {
 	branch := model.Branch{}
-	result := br.db.First(branch, "id = ?", id)
-	if result.Error != nil {
-		return model.Branch{}, result.Error
-	}
+	err := br.db.First(branch, "id = ?", id).Error
 
-	return branch, nil
+	return branch, err
 }
 
 func (br branchRepositry) Create(data dto.BranchCreateDTO) error {
-
-	newBranch := &model.Branch{
+	return br.db.Create(&model.Branch{
 		OrganizationID: data.OrganizationID,
 		Name:           data.Name,
 		IsActive:       data.IsActive,
-	}
-
-	result := br.db.Create(newBranch)
-
-	return result.Error
+	}).Error
 }
 
 func (br branchRepositry) Update(id int, data dto.BranchUpdateDTO) error {
 	branch := model.Branch{}
-	result := br.db.First(branch, "id = ?", id)
-	if result.Error != nil {
-		return result.Error
+	err := br.db.First(branch, "id = ?", id).Error
+	if err != nil {
+		return err
 	}
 
-	result = br.db.Updates(data).Update("updated_at", time.Now())
-	if result.Error == nil {
-		return result.Error
-	}
-
-	return nil
+	return br.db.Model(branch).Updates(data).Error
 }
 
 func (br branchRepositry) Delete(id int) error {

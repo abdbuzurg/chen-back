@@ -1,9 +1,11 @@
 package model
 
+import "gorm.io/gorm"
+
 type Hall struct {
-	OwnModel
-	Name     string `json:"name"`
-	BranchID uint   `json:"-"`
+	gorm.Model `json:"-"`
+	Name       string `json:"name"`
+	BranchID   uint   `json:"-"`
 
 	// One to Many
 	Tables []Table `json:"-"`

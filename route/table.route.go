@@ -1,7 +1,8 @@
-package routes
+package route
 
 import (
 	"chen/pkg/controller"
+	"chen/pkg/middleware"
 	"chen/pkg/repository"
 	"chen/pkg/service"
 )
@@ -11,7 +12,7 @@ func (s *Server) TableCRUDEndpoint() {
 	tableService := service.NewTableService(tableRepo)
 	tableController := controller.NewTableController(tableService)
 
-	table := s.Router.Group("/table")
+	table := s.Router.Group("/table", middleware.AuthMiddleware())
 	table.GET("", tableController.FindAll)
 	table.GET("/:id", tableController.FindById)
 	table.POST("", tableController.Create)

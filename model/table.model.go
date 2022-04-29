@@ -1,9 +1,11 @@
 package model
 
+import "gorm.io/gorm"
+
 type Table struct {
-	OwnModel
-	X      float32 `json:"x"`
-	Y      float32 `json:"y"`
-	Number uint    `json:"number"`
-	HallID uint
+	gorm.Model `json:"-"`
+	X          float32 `json:"x"`
+	Y          float32 `json:"y"`
+	Number     uint    `json:"number"`
+	HallID     uint
 }

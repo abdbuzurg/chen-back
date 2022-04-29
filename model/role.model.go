@@ -1,12 +1,15 @@
 package model
 
+import "gorm.io/gorm"
+
 type Role struct {
-	OwnModel
-	Name string `json:"name"`
+	gorm.Model  `json:"-"`
+	Title       string `json:"title"`
+	Description string `json:"description"`
 
 	// one to many with USER
-	Users []User
+	Users []User `json:"-"`
 
 	// MANY TO MANY with PERMISSION
-	Permissions []Permission `gorm:"many2many:roles_permissions;"`
+	Permissions []Permission `json:"-" gorm:"many2many:roles_permissions;"`
 }

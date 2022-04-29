@@ -1,9 +1,11 @@
 package model
 
+import "gorm.io/gorm"
+
 type Item struct {
-	OwnModel
-	Price float32 `json:"price"`
-	Name  string  `json:"name"`
+	gorm.Model `json:"-"`
+	Price      float32 `json:"price"`
+	Name       string  `json:"name"`
 
 	// One to Many
 	OrderList []OrderList

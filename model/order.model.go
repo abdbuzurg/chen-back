@@ -1,9 +1,11 @@
 package model
 
+import "gorm.io/gorm"
+
 type Order struct {
-	OwnModel
-	TableID uint
-	Status  bool `json:"status"`
+	gorm.Model `json:"-"`
+	TableID    uint
+	Status     bool `json:"status"`
 
 	// One to Many
 	OrderList []OrderList

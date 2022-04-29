@@ -1,7 +1,8 @@
-package routes
+package route
 
 import (
 	"chen/pkg/controller"
+	"chen/pkg/middleware"
 	"chen/pkg/repository"
 	"chen/pkg/service"
 )
@@ -11,7 +12,7 @@ func (s *Server) BranchCRUDEndpoints() {
 	branchService := service.NewBranchService(branchRepo)
 	branchController := controller.NewBranchController(branchService)
 
-	branch := s.Router.Group("/branch")
+	branch := s.Router.Group("/branch", middleware.AuthMiddleware())
 	branch.GET("", branchController.FindAll)
 	branch.GET("/:id", branchController.FindById)
 	branch.POST("", branchController.Create)

@@ -1,9 +1,11 @@
 package model
 
+import "gorm.io/gorm"
+
 type Organization struct {
-	OwnModel
-	Name     string `json:"name"`
-	IsActive bool   `json:"is_active"`
+	gorm.Model `json:"-"`
+	Name       string `json:"name"`
+	IsActive   bool   `json:"is_active"`
 
 	//One to Many
 	Branches []Branch `json:"-"`

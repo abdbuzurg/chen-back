@@ -9,7 +9,8 @@ import (
 
 type Payload struct {
 	jwt.StandardClaims
-	UserId uint `json:"user_id"`
+	UserID uint `json:"user_id"`
+	RoleID uint `json:"role_id"`
 }
 
 const (
@@ -17,13 +18,14 @@ const (
 	tokenTTL  = 12 * time.Hour
 )
 
-func GenerateToken(userId uint) (string, error) {
+func GenerateToken(userID, roleID uint) (string, error) {
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, &Payload{
 		jwt.StandardClaims{
 			ExpiresAt: time.Now().Add(tokenTTL).Unix(),
 			IssuedAt:  time.Now().Unix(),
 		},
-		userId,
+		userID,
+		roleID,
 	})
 	return token.SignedString([]byte(secretKey))
 }

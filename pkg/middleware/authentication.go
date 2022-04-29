@@ -15,6 +15,7 @@ func AuthMiddleware() gin.HandlerFunc {
 		if len(authHeader) == 0 {
 			message := "Authorization header is not provided"
 			response.FormatResponse(c, http.StatusUnauthorized, message, false)
+			c.Abort()
 			return
 		}
 
@@ -22,6 +23,7 @@ func AuthMiddleware() gin.HandlerFunc {
 		if len(fields) < 2 {
 			message := "Invalid authorization header format"
 			response.FormatResponse(c, http.StatusForbidden, message, false)
+			c.Abort()
 			return
 		}
 
@@ -29,6 +31,7 @@ func AuthMiddleware() gin.HandlerFunc {
 		if authType != "bearer" {
 			message := "Unsupported authorization type"
 			response.FormatResponse(c, http.StatusForbidden, message, false)
+			c.Abort()
 			return
 		}
 
@@ -36,9 +39,11 @@ func AuthMiddleware() gin.HandlerFunc {
 		payload, err := token.VerifyToken(accessToken)
 		if err != nil {
 			response.FormatResponse(c, http.StatusForbidden, err.Error, false)
+			c.Abort()
 			return
 		}
 
 		c.Set("payload", payload)
+		c.Next()
 	}
 }

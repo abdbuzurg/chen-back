@@ -1,7 +1,8 @@
-package routes
+package route
 
 import (
 	"chen/pkg/controller"
+	"chen/pkg/middleware"
 	"chen/pkg/repository"
 	"chen/pkg/service"
 )
@@ -11,7 +12,7 @@ func (s *Server) OrganizationCRUDEndpoints() {
 	organizationService := service.NewOrganizationService(organizationRepo)
 	organizationController := controller.NewOrganizationController(organizationService)
 
-	org := s.Router.Group("/organization")
+	org := s.Router.Group("/organization", middleware.AuthMiddleware())
 	org.GET("", organizationController.FindAll)
 	org.GET("/:id", organizationController.FindById)
 	org.POST("", organizationController.Create)

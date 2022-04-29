@@ -1,7 +1,9 @@
 package model
 
+import "gorm.io/gorm"
+
 type Branch struct {
-	OwnModel
+	gorm.Model     `json:"-"`
 	OrganizationID uint
 	Name           string `json:"name"`
 	IsActive       bool   `json:"is_active" gorm:"column:isActive"`

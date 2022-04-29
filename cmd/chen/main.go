@@ -2,11 +2,11 @@ package main
 
 import (
 	"chen/db"
-	"chen/routes"
+	"chen/route"
 )
 
 func main() {
 	db.OpenSQLiteConnection()
-	server := routes.NewServer(db.GetSQLiteConnection())
+	server := route.NewServer(db.GetSQLiteConnection())
 	server.ServerListen()
 }

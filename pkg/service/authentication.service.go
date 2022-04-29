@@ -39,7 +39,6 @@ func (as authenticationService) AuthRegister(registrationData dto.Authentication
 	return nil
 }
 
-// CHANGE RETURN TO VALID JWT TOKEN
 func (as authenticationService) AuthLogin(loginData dto.AuthenticationLoginDTO) (string, error) {
 	user, err := as.authenticationRepository.UserFindByUsername(loginData.Username)
 	if err != nil {
@@ -50,7 +49,7 @@ func (as authenticationService) AuthLogin(loginData dto.AuthenticationLoginDTO) 
 		return "Incorrect password", err
 	}
 
-	token, err := token.GenerateToken(user.ID)
+	token, err := token.GenerateToken(user.ID, user.RoleID)
 	if err != nil {
 		return "Error logging in", err
 	}

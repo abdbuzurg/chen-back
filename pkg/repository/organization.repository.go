@@ -3,8 +3,6 @@ package repository
 import (
 	"chen/model"
 	"chen/pkg/dto"
-	"errors"
-	"time"
 
 	"gorm.io/gorm"
 )
@@ -30,48 +28,31 @@ func NewOrganizationRepo(db *gorm.DB) OrganizationRepo {
 func (or organizationRepo) FindAll() ([]model.Organization, error) {
 	orgs := []model.Organization{}
 	err := or.db.Find(&orgs).Error
-
 	return orgs, err
 }
 
 func (or organizationRepo) FindById(id int) (model.Organization, error) {
-
-	var org model.Organization
-	result := or.db.First(&org, "id = ?", id)
-	if result.Error != nil {
-		return model.Organization{}, errors.New("org not found")
-	}
-
-	return org, nil
+	org := model.Organization{}
+	err := or.db.First(&org, "id = ?", id).Error
+	return org, err
 }
+
 func (or organizationRepo) Create(data dto.OrganizationDTO) error {
-
-	newOrg := &model.Organization{
-		IsActive: data.IsActive,
+	return or.db.Create(&model.Organization{
 		Name:     data.Name,
-	}
-
-	result := or.db.Create(newOrg)
-	if result.Error != nil {
-		return result.Error
-	}
-
-	return nil
+		IsActive: data.IsActive,
+	}).Error
 }
+
 func (or organizationRepo) Update(id int, data dto.OrganizationDTO) error {
 
-	var org model.Organization
-	result := or.db.First(&org, "id = ?", id)
-	if result.Error != nil {
-		return result.Error
+	org := model.Organization{}
+	err := or.db.First(&org, "id = ?", id).Error
+	if err != nil {
+		return err
 	}
 
-	result = or.db.Model(org).Updates(data).Update("updated_at", time.Now())
-	if result.Error != nil {
-		return result.Error
-	}
-
-	return nil
+	return or.db.Model(org).Updates(data).Error
 }
 
 func (or organizationRepo) Delete(id int) error {
