@@ -48,13 +48,13 @@ func (ac authentificationController) Login(c *gin.Context) {
 		return
 	}
 
-	message, err := ac.authenticationService.AuthLogin(dataForLogin)
+	token, err := ac.authenticationService.AuthLogin(dataForLogin)
 	if err != nil {
-		response.FormatResponse(c, http.StatusInternalServerError, message, false)
+		response.FormatResponse(c, http.StatusInternalServerError, err.Error(), false)
 		return
 	}
 
 	response.FormatResponse(c, http.StatusOK, gin.H{
-		"token": message,
+		"token": token,
 	}, true)
 }

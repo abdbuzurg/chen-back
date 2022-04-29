@@ -4,6 +4,7 @@ import (
 	"chen/pkg/dto"
 	"chen/pkg/repository"
 	"chen/utils/token"
+	"errors"
 
 	"golang.org/x/crypto/bcrypt"
 )
@@ -42,16 +43,16 @@ func (as authenticationService) AuthRegister(registrationData dto.Authentication
 func (as authenticationService) AuthLogin(loginData dto.AuthenticationLoginDTO) (string, error) {
 	user, err := as.authenticationRepository.UserFindByUsername(loginData.Username)
 	if err != nil {
-		return "User does not exist", err
+		return "", errors.New("invalid credentials")
 	}
 
 	if err := bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(loginData.Password)); err != nil {
-		return "Incorrect password", err
+		return "", errors.New("invalid credentials")
 	}
 
 	token, err := token.GenerateToken(user.ID, user.RoleID)
 	if err != nil {
-		return "Error logging in", err
+		return "", errors.New("could not sign in")
 	}
 
 	return token, nil
