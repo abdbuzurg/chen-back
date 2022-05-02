@@ -33,7 +33,7 @@ func (br branchRepositry) FindAll() ([]model.Branch, error) {
 
 func (br branchRepositry) FindById(id int) (model.Branch, error) {
 	branch := model.Branch{}
-	err := br.db.First(branch, "id = ?", id).Error
+	err := br.db.First(&branch, "id = ?", id).Error
 
 	return branch, err
 }

@@ -1,0 +1,152 @@
+[
+  {
+    "title":"SuperAdmin",
+    "description": "Has full control of the system",
+    "permissions": [
+      {
+        "methods:":[
+          "GET", "POST", "PUT", "DELETE"
+        ],
+        "path":"/organization"
+      },
+      {
+        "methods:":[
+          "GET", "POST", "PUT", "DELETE"
+        ],
+        "path":"/branch"
+      },
+      {
+        "methods:":[
+          "GET", "POST", "PUT", "DELETE"
+        ],
+        "path":"/hall"
+      },
+      {
+        "methods:":[
+          "GET", "POST", "PUT", "DELETE"
+        ],
+        "path":"/table"
+      }
+    ]
+  },
+  {
+    "title":"Admin",
+    "description": "Has full control of the system",
+    "permissions": [
+      {
+        "methods:":[
+          "GET", "PUT"
+        ],
+        "path":"/organization"
+      },
+      {
+        "methods:":[
+          "GET", "POST", "PUT", "DELETE"
+        ],
+        "path":"/branch"
+      },
+      {
+        "methods:":[
+          "GET", "POST", "PUT", "DELETE"
+        ],
+        "path":"/hall"
+      },
+      {
+        "methods:":[
+          "GET", "POST", "PUT", "DELETE"
+        ],
+        "path":"/table"
+      }
+    ]
+  },
+  {
+    "title":"Manager",
+    "description": "Has full control of the system",
+    "permissions": [
+      {
+        "methods:":[
+          "GET"
+        ],
+        "path":"/organization"
+      },
+      {
+        "methods:":[
+          "GET",  "PUT" 
+        ],
+        "path":"/branch"
+      },
+      {
+        "methods:":[
+          "GET", "POST", "PUT", "DELETE"
+        ],
+        "path":"/hall"
+      },
+      {
+        "methods:":[
+          "GET", "POST", "PUT", "DELETE"
+        ],
+        "path":"/table"
+      }
+    ]
+  },
+  {
+    "title":"Cashier",
+    "description": "Has full control of the system",
+    "permissions": [
+      {
+        "methods:":[
+          "GET", "PUT"
+        ],
+        "path":"/organization"
+      },
+      {
+        "methods:":[
+          "GET" 
+        ],
+        "path":"/branch"
+      },
+      {
+        "methods:":[
+          "GET", "POST", "PUT", "DELETE"
+        ],
+        "path":"/hall"
+      },
+      {
+        "methods:":[
+          "GET", "POST", "PUT", "DELETE"
+        ],
+        "path":"/table"
+      }
+    ]
+  },
+  {
+    "title":"Waiter",
+    "description": "Has full control of the system",
+    "permissions": [
+      {
+        "methods:":[
+          "GET", "PUT"
+        ],
+        "path":"/organization"
+      },
+      {
+        "methods:":[
+          "GET" 
+        ],
+        "path":"/branch"
+      },
+      {
+        "methods:":[
+          "GET"
+        ],
+        "path":"/hall"
+      },
+      {
+        "methods:":[
+          "GET", "POST", "PUT", "DELETE"
+        ],
+        "path":"/table"
+      }
+    ]
+  }
+]

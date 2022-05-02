@@ -13,8 +13,7 @@ func (s *Server) OrganizationCRUDEndpoints() {
 	organizationController := controller.NewOrganizationController(organizationService)
 
 	org := s.Router.Group("/organization", middleware.AuthMiddleware())
-	org.GET("", organizationController.FindAll)
-	org.GET("/:id", organizationController.FindById)
+	org.GET("", organizationController.Find)
 	org.POST("", organizationController.Create)
 	org.PUT("/:id", organizationController.Update)
 	org.DELETE("/:id", organizationController.Delete)

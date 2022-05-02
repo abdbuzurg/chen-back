@@ -38,7 +38,8 @@ func AuthMiddleware() gin.HandlerFunc {
 		accessToken := fields[1]
 		payload, err := token.VerifyToken(accessToken)
 		if err != nil {
-			response.FormatResponse(c, http.StatusForbidden, err.Error, false)
+			message := "Invalid token"
+			response.FormatResponse(c, http.StatusForbidden, message, false)
 			c.Abort()
 			return
 		}

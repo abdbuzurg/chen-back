@@ -11,8 +11,7 @@ import (
 )
 
 type OrganizationController interface {
-	FindAll(c *gin.Context)
-	FindById(c *gin.Context)
+	Find(c *gin.Context)
 	Create(c *gin.Context)
 	Update(c *gin.Context)
 	Delete(c *gin.Context)
@@ -29,22 +28,33 @@ func NewOrganizationController(service service.OrganizationService) Organization
 }
 
 func (oc organizationController) FindAll(c *gin.Context) {
-	orgs, err := oc.organizationService.FindAll()
-	if err != nil {
-		response.FormatResponse(c, http.StatusInternalServerError, "could not fetch entries", false)
-		return
-	}
 
-	response.FormatResponse(c, http.StatusOK, orgs, true)
 }
 
-func (oc organizationController) FindById(c *gin.Context) {
-	idRaw := c.Param("id")
-	id, err := strconv.Atoi(idRaw)
-	if err != nil {
-		response.FormatResponse(c, http.StatusBadRequest, "Invalid parameters", false)
+func (oc organizationController) Find(c *gin.Context) {
+	idRaw, exists := c.GetQuery("id")
+	if !exists {
+		response.FormatResponse(c, http.StatusBadRequest, "Invalid query parameters", false)
 		return
 	}
+
+	id, err := strconv.Atoi(idRaw)
+	if err != nil {
+		response.FormatResponse(c, http.StatusBadRequest, "Invalid query parameters values", false)
+		return
+	}
+
+	if id == 0 {
+		orgs, err := oc.organizationService.FindAll()
+		if err != nil {
+			response.FormatResponse(c, http.StatusInternalServerError, "could not fetch entries", false)
+			return
+		}
+
+		response.FormatResponse(c, http.StatusOK, orgs, true)
+		return
+	}
+
 	org, err := oc.organizationService.FindById(id)
 	if err != nil {
 		response.FormatResponse(c, http.StatusInternalServerError, err.Error(), false)

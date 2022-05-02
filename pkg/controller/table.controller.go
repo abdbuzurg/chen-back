@@ -11,8 +11,7 @@ import (
 )
 
 type TableController interface {
-	FindAll(c *gin.Context)
-	FindById(c *gin.Context)
+	Find(c *gin.Context)
 	Create(c *gin.Context)
 	Update(c *gin.Context)
 	Delete(c *gin.Context)
@@ -28,21 +27,27 @@ func NewTableController(service service.TableService) TableController {
 	}
 }
 
-func (tc tableController) FindAll(c *gin.Context) {
-	tables, err := tc.tableService.FindAll()
-	if err != nil {
-		response.FormatResponse(c, http.StatusInternalServerError, "Could not get tables", false)
+func (tc tableController) Find(c *gin.Context) {
+	idRaw, exists := c.GetQuery("id")
+	if !exists {
+		response.FormatResponse(c, http.StatusBadRequest, "Invalid query parameters", false)
 		return
 	}
 
-	response.FormatResponse(c, http.StatusOK, tables, true)
-}
-
-func (tc tableController) FindById(c *gin.Context) {
-	idRaw := c.Param("id")
 	id, err := strconv.Atoi(idRaw)
 	if err != nil {
 		response.FormatResponse(c, http.StatusBadRequest, "Invalid Parameters", false)
+		return
+	}
+
+	if id == 0 {
+		tables, err := tc.tableService.FindAll()
+		if err != nil {
+			response.FormatResponse(c, http.StatusInternalServerError, "Could not get tables", false)
+			return
+		}
+
+		response.FormatResponse(c, http.StatusOK, tables, true)
 		return
 	}
 

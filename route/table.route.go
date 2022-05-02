@@ -13,8 +13,7 @@ func (s *Server) TableCRUDEndpoint() {
 	tableController := controller.NewTableController(tableService)
 
 	table := s.Router.Group("/table", middleware.AuthMiddleware())
-	table.GET("", tableController.FindAll)
-	table.GET("/:id", tableController.FindById)
+	table.GET("/", tableController.Find)
 	table.POST("", tableController.Create)
 	table.PUT("/:id", tableController.Update)
 	table.DELETE("/:id", tableController.Delete)

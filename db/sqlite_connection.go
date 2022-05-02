@@ -1,31 +1,51 @@
 package db
 
 import (
+	"chen/db/migration"
 	"chen/model"
 	"fmt"
+	"log"
 
+	"github.com/gin-gonic/gin"
 	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
 )
 
-var dbSQLite *gorm.DB
+type SQLiteConnection interface {
+	Get() *gorm.DB
+	InitialMigration(r *gin.Engine) error
+	autoUpdate() error
+}
 
-func OpenSQLiteConnection() {
+type sqliteConnection struct {
+	db *gorm.DB
+}
+
+func NewSQLiteConnection() (SQLiteConnection, error) {
+	connection := sqliteConnection{}
 	dbSQLiteConnection, err := gorm.Open(sqlite.Open("test.db"), &gorm.Config{})
 	if err != nil {
-		panic(err.Error())
+		log.Fatal("could not get db connection")
+		return connection, err
 	}
 
-	dbSQLite = dbSQLiteConnection
-	autoUpdate()
+	connection.db = dbSQLiteConnection
+
+	err = connection.autoUpdate()
+	if err != nil {
+		log.Fatal("could auto update tables")
+		return connection, err
+	}
+
+	return connection, nil
 }
 
-func GetSQLiteConnection() *gorm.DB {
-	return dbSQLite
+func (liteConn sqliteConnection) Get() *gorm.DB {
+	return liteConn.db
 }
 
-func autoUpdate() {
-	err := dbSQLite.AutoMigrate(
+func (liteConn sqliteConnection) autoUpdate() error {
+	err := liteConn.db.AutoMigrate(
 		&model.User{},
 		&model.Role{},
 		&model.Permission{},
@@ -37,9 +57,13 @@ func autoUpdate() {
 		&model.Order{},
 		&model.OrderList{},
 	)
-	fmt.Println("Auto update done")
 	if err != nil {
-		fmt.Println(err.Error())
-		panic(err.Error())
+		return err
 	}
+	fmt.Println("Auto update done")
+	return nil
+}
+
+func (liteConn sqliteConnection) InitialMigration(r *gin.Engine) error {
+	return migration.InitialMigration(r, liteConn.db)
 }

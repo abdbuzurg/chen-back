@@ -11,8 +11,7 @@ import (
 )
 
 type BranchController interface {
-	FindAll(c *gin.Context)
-	FindById(c *gin.Context)
+	Find(c *gin.Context)
 	Create(c *gin.Context)
 	Update(c *gin.Context)
 	Delete(c *gin.Context)
@@ -28,24 +27,31 @@ func NewBranchController(service service.BranchService) BranchController {
 	}
 }
 
-func (bc branchController) FindAll(c *gin.Context) {
-	branches, err := bc.branchService.FindAll()
-	if err != nil {
-		response.FormatResponse(c, http.StatusInternalServerError, "Could not get branches", false)
+func (bc branchController) Find(c *gin.Context) {
+	idRaw, exists := c.GetQuery("id")
+	if !exists {
+		response.FormatResponse(c, http.StatusBadRequest, "Invalid query parameters", false)
 		return
 	}
 
-	response.FormatResponse(c, http.StatusOK, branches, true)
-}
-
-func (bc branchController) FindById(c *gin.Context) {
-	idRaw := c.Param("id")
 	id, err := strconv.Atoi(idRaw)
 	if err != nil {
-		response.FormatResponse(c, http.StatusBadRequest, "Invalid Parameters", false)
+		response.FormatResponse(c, http.StatusBadRequest, "Invalid query parameters values", false)
 		return
 	}
 
+	if id == 0 {
+		// http://web.site/branch
+		branches, err := bc.branchService.FindAll()
+		if err != nil {
+			response.FormatResponse(c, http.StatusInternalServerError, "Could not get branches", false)
+			return
+		}
+
+		response.FormatResponse(c, http.StatusOK, branches, true)
+		return
+	}
+	// http://web.site/branch?id=1
 	branch, err := bc.branchService.FindById(id)
 	if err != nil {
 		response.FormatResponse(c, http.StatusInternalServerError, "Could not find Branch", false)
@@ -53,6 +59,7 @@ func (bc branchController) FindById(c *gin.Context) {
 	}
 
 	response.FormatResponse(c, http.StatusOK, branch, true)
+
 }
 
 func (bc branchController) Create(c *gin.Context) {

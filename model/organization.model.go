@@ -4,7 +4,7 @@ import "gorm.io/gorm"
 
 type Organization struct {
 	gorm.Model `json:"-"`
-	Name       string `json:"name"`
+	Name       string `json:"name"  gorm:"unique"`
 	IsActive   bool   `json:"is_active"`
 
 	//One to Many
