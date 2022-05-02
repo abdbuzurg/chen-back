@@ -81,7 +81,11 @@ func (oc organizationController) Create(c *gin.Context) {
 }
 
 func (oc organizationController) Update(c *gin.Context) {
-	idRaw := c.Param("id")
+	idRaw, exists := c.GetQuery("id")
+	if !exists {
+		response.FormatResponse(c, http.StatusBadRequest, "Invalid query parameters", false)
+		return
+	}
 	id, err := strconv.Atoi(idRaw)
 	if err != nil {
 		response.FormatResponse(c, http.StatusBadRequest, "Invalid parameters", false)
@@ -102,8 +106,11 @@ func (oc organizationController) Update(c *gin.Context) {
 	response.FormatResponse(c, http.StatusOK, "Info updated successfully", true)
 }
 func (oc organizationController) Delete(c *gin.Context) {
-
-	idRaw := c.Param("id")
+	idRaw, exists := c.GetQuery("id")
+	if !exists {
+		response.FormatResponse(c, http.StatusBadRequest, "Invalid query parameters", false)
+		return
+	}
 	id, err := strconv.Atoi(idRaw)
 	if err != nil {
 		response.FormatResponse(c, http.StatusBadRequest, "Invalid parameters", false)

@@ -77,7 +77,11 @@ func (hc hallController) Create(c *gin.Context) {
 }
 
 func (hc hallController) Update(c *gin.Context) {
-	idRaw := c.Param("id")
+	idRaw, exists := c.GetQuery("id")
+	if !exists {
+		response.FormatResponse(c, http.StatusBadRequest, "Invalid query parameters", false)
+		return
+	}
 	id, err := strconv.Atoi(idRaw)
 	if err != nil {
 		response.FormatResponse(c, http.StatusBadRequest, "Invalid Parameters", false)
@@ -100,7 +104,11 @@ func (hc hallController) Update(c *gin.Context) {
 }
 
 func (hc hallController) Delete(c *gin.Context) {
-	idRaw := c.Param("id")
+	idRaw, exists := c.GetQuery("id")
+	if !exists {
+		response.FormatResponse(c, http.StatusBadRequest, "Invalid query parameters", false)
+		return
+	}
 	id, err := strconv.Atoi(idRaw)
 	if err != nil {
 		response.FormatResponse(c, http.StatusBadRequest, "Invalid Parameters", false)

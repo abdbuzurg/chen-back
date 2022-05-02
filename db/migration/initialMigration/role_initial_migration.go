@@ -2,21 +2,55 @@ package initialMigration
 
 import (
 	"chen/model"
+	"encoding/json"
+	"fmt"
+	"io/ioutil"
+	"log"
+	"os"
 	"time"
 
 	"gorm.io/gorm"
 )
 
-var defaultRoles = map[string]string{
-	"SuperAdmin": "Full control in the system",
-	"Admin":      "Has full access in the organization/branch",
-	"Manager":    "Has access to controlling the stuff and more defined by you",
-	"Cashier":    "Has access to finishing order and more defined by you",
-	"Waiter":     "Has access to only ordering",
+const ORGANIZATION_ID = 1
+
+type Permission struct {
+	Method string `json:"method"`
+	Path   string `json:"path"`
 }
 
-const organizationID = 1
+type role struct {
+	Title          string       `json:"title"`
+	Description    string       `json:"description"`
+	OrganizationID uint         `json:"organization_id"`
+	Permissions    []Permission `json:"permissions"`
+}
 
+// open file and parses the file
+func openFileAndParse(filename string) ([]role, error) {
+
+	jsonFile, err := os.Open(filename)
+	if err != nil {
+		log.Fatalln("could not open json file")
+		return nil, err
+	}
+
+	defer jsonFile.Close()
+
+	byteValue, _ := ioutil.ReadAll(jsonFile)
+
+	roles := []role{}
+	err = json.Unmarshal(byteValue, &roles)
+	if err != nil {
+		fmt.Println(err.Error())
+		log.Fatalln("could not parse json file")
+		return nil, err
+	}
+
+	return roles, nil
+}
+
+//Check if role table has the default roles
 func RoleChecker(db *gorm.DB) error {
 	roles := []model.Role{}
 	err := db.Find(&roles).Error
@@ -24,41 +58,50 @@ func RoleChecker(db *gorm.DB) error {
 		return err
 	}
 
-	if len(roles) == 0 {
-		return initializeRoles(db)
+	defaultRoles, err := openFileAndParse("db/migration/initialMigration/roles_initial_migration.json")
+	if err != nil {
+		return err
 	}
 
-	return updateRoles(db, roles)
+	if len(roles) == 0 {
+		return initializeRoles(db, defaultRoles)
+	}
+
+	return updateRoles(db, roles, defaultRoles)
 }
 
-func initializeRoles(db *gorm.DB) error {
-	roles := []model.Role{}
-	for key, value := range defaultRoles {
-		roles = append(roles, model.Role{
-			Model: gorm.Model{
-				CreatedAt: time.Now(),
-				UpdatedAt: time.Now(),
-				DeletedAt: gorm.DeletedAt{},
-			},
-			Title:          key,
-			Description:    value,
-			OrganizationID: organizationID,
-		})
+// initializes roles if they do not exist
+func initializeRoles(db *gorm.DB, defaultRoles []role) error {
+	for _, role := range defaultRoles {
+		err := db.Create(&role).Error
+		if err != nil {
+			return err
+		}
+
+		for _, permission := range role.Permissions {
+			if err = db.Model(&role).Association("permissions").Append(&model.Permission{
+				Method: permission.Method,
+				Path:   permission.Path,
+			}); err != nil {
+				return err
+			}
+
+		}
 	}
 
-	return db.CreateInBatches(&roles, 5).Error
+	return nil
 }
 
 // check if default ROLES are there
 // if not returs the STATUS (bool) and the missings ROLES ([]Roles)
-func missingDefaultRoles(roles []model.Role) (bool, []model.Role) {
+func missingDefaultRoles(roles []model.Role, defaultRoles []role) (bool, []model.Role) {
 	status := false
 	result := []model.Role{}
 
-	for key, value := range defaultRoles {
+	for _, defaultRole := range defaultRoles {
 		exists := false
 		for _, role := range roles {
-			if role.Title == key {
+			if role.Title == defaultRole.Title {
 				exists = true
 				break
 			}
@@ -71,9 +114,9 @@ func missingDefaultRoles(roles []model.Role) (bool, []model.Role) {
 					UpdatedAt: time.Now(),
 					DeletedAt: gorm.DeletedAt{},
 				},
-				Title:          key,
-				Description:    value,
-				OrganizationID: organizationID,
+				Title:          defaultRole.Title,
+				Description:    defaultRole.Description,
+				OrganizationID: ORGANIZATION_ID,
 			})
 
 			status = true
@@ -83,14 +126,11 @@ func missingDefaultRoles(roles []model.Role) (bool, []model.Role) {
 	return status, result
 }
 
-func updateRoles(db *gorm.DB, roles []model.Role) error {
-	if status, missingRoles := missingDefaultRoles(roles); status {
+// updates roles if they are not there
+func updateRoles(db *gorm.DB, roles []model.Role, defaultRoles []role) error {
+	if status, missingRoles := missingDefaultRoles(roles, defaultRoles); status {
 		return db.CreateInBatches(&missingRoles, 4).Error
 	}
 
 	return nil
-}
-
-func destributeDefaultPermission() {
-
 }

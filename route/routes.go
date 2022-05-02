@@ -18,7 +18,6 @@ func NewServer(db *gorm.DB) Server {
 	r := gin.Default()
 
 	r.Use(cors.Default())
-	r.Use(gin.Recovery())
 
 	server := Server{
 		DB:     db,

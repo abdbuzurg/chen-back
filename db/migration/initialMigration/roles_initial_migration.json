@@ -2,151 +2,282 @@
   {
     "title":"SuperAdmin",
     "description": "Has full control of the system",
+    "organization_id" : 1,
     "permissions": [
       {
-        "methods:":[
-          "GET", "POST", "PUT", "DELETE"
-        ],
+        "method": "GET",
+        "path":"/organization?id=0"
+      },
+      {
+        "method": "GET",
+        "path":"/organization?id="
+      },
+      {
+        "method": "POST",
         "path":"/organization"
       },
       {
-        "methods:":[
-          "GET", "POST", "PUT", "DELETE"
-        ],
+        "method": "PUT",
+        "path":"/organization?id="
+      },
+      {
+        "method": "DELETE",
+        "path":"/organization?id="
+      },
+      {
+        "method": "GET",
+        "path":"/branch?id=0"
+      },
+      {
+        "method": "GET",
+        "path":"/branch?id="
+      },
+      {
+        "method": "POST",
         "path":"/branch"
       },
       {
-        "methods:":[
-          "GET", "POST", "PUT", "DELETE"
-        ],
+        "method": "PUT",
+        "path":"/branch?id="
+      },
+      {
+        "method": "DELETE",
+        "path":"/branch?id="
+      },
+      {
+        "method": "GET",
+        "path":"/hall?id=0"
+      },
+      {
+        "method": "GET",
+        "path":"/hall?id="
+      },
+      {
+        "method": "POST",
         "path":"/hall"
       },
       {
-        "methods:":[
-          "GET", "POST", "PUT", "DELETE"
-        ],
+        "method": "PUT",
+        "path":"/hall?id="
+      },
+      {
+        "method": "DELETE",
+        "path":"/hall?id="
+      },
+      {
+        "method": "GET",
+        "path":"/table?id=0"
+      },
+      {
+        "method": "GET",
+        "path":"/table?id="
+      },
+      {
+        "method": "POST",
         "path":"/table"
+      },
+      {
+        "method": "PUT",
+        "path":"/table?id="
+      },
+      {
+        "method": "DELETE",
+        "path":"/table?id="
       }
     ]
   },
   {
     "title":"Admin",
-    "description": "Has full control of the system",
+    "description": "Has full control of the organization",
+    "organization_id" : 1,
     "permissions": [
       {
-        "methods:":[
-          "GET", "PUT"
-        ],
-        "path":"/organization"
+        "method": "GET",
+        "path":"/organization?id="
       },
       {
-        "methods:":[
-          "GET", "POST", "PUT", "DELETE"
-        ],
+        "method": "PUT",
+        "path":"/organization?id="
+      },
+      {
+        "method": "GET",
+        "path":"/branch?id=0"
+      },
+      {
+        "method": "GET",
+        "path":"/branch?id="
+      },
+      {
+        "method": "POST",
         "path":"/branch"
       },
       {
-        "methods:":[
-          "GET", "POST", "PUT", "DELETE"
-        ],
+        "method": "PUT",
+        "path":"/branch?id="
+      },
+      {
+        "method": "DELETE",
+        "path":"/branch?id="
+      },
+      {
+        "method": "GET",
+        "path":"/hall?id=0"
+      },
+      {
+        "method": "GET",
+        "path":"/hall?id="
+      },
+      {
+        "method": "POST",
         "path":"/hall"
       },
       {
-        "methods:":[
-          "GET", "POST", "PUT", "DELETE"
-        ],
+        "method": "PUT",
+        "path":"/hall?id="
+      },
+      {
+        "method": "DELETE",
+        "path":"/hall?id="
+      },
+      {
+        "method": "GET",
+        "path":"/table?id=0"
+      },
+      {
+        "method": "GET",
+        "path":"/table?id="
+      },
+      {
+        "method": "POST",
         "path":"/table"
+      },
+      {
+        "method": "PUT",
+        "path":"/table?id="
+      },
+      {
+        "method": "DELETE",
+        "path":"/table?id="
       }
     ]
   },
   {
     "title":"Manager",
-    "description": "Has full control of the system",
+    "description": "Same as cashier but can control halls and the branch",
+    "organization_id" : 1,
     "permissions": [
       {
-        "methods:":[
-          "GET"
-        ],
-        "path":"/organization"
+        "method": "GET",
+        "path":"/organization?id="
+      },   
+      {
+        "method": "GET",
+        "path":"/branch?id="
       },
       {
-        "methods:":[
-          "GET",  "PUT" 
-        ],
-        "path":"/branch"
+        "method": "GET",
+        "path":"/hall?id=0"
       },
       {
-        "methods:":[
-          "GET", "POST", "PUT", "DELETE"
-        ],
+        "method": "GET",
+        "path":"/hall?id="
+      },
+      {
+        "method": "POST",
         "path":"/hall"
       },
       {
-        "methods:":[
-          "GET", "POST", "PUT", "DELETE"
-        ],
+        "method": "PUT",
+        "path":"/hall?id="
+      },
+      {
+        "method": "DELETE",
+        "path":"/hall?id="
+      },
+      {
+        "method": "GET",
+        "path":"/table?id=0"
+      },
+      {
+        "method": "GET",
+        "path":"/table?id="
+      },
+      {
+        "method": "POST",
         "path":"/table"
+      },
+      {
+        "method": "PUT",
+        "path":"/table?id="
+      },
+      {
+        "method": "DELETE",
+        "path":"/table?id="
       }
     ]
   },
   {
     "title":"Cashier",
-    "description": "Has full control of the system",
-    "permissions": [
+    "description": "Can close the order and change tables",
+    "organization_id" : 1,
+    "permissions":[
       {
-        "methods:":[
-          "GET", "PUT"
-        ],
-        "path":"/organization"
+        "method": "GET",
+        "path":"/organization?id="
       },
       {
-        "methods:":[
-          "GET" 
-        ],
-        "path":"/branch"
+        "method": "GET",
+        "path":"/branch?id="
       },
       {
-        "methods:":[
-          "GET", "POST", "PUT", "DELETE"
-        ],
-        "path":"/hall"
+        "method": "GET",
+        "path":"/hall?id="
       },
       {
-        "methods:":[
-          "GET", "POST", "PUT", "DELETE"
-        ],
+        "method": "GET",
+        "path":"/table?id=0"
+      },
+      {
+        "method": "GET",
+        "path":"/table?id="
+      },
+      {
+        "method": "POST",
         "path":"/table"
+      },
+      {
+        "method": "PUT",
+        "path":"/table?id="
+      },
+      {
+        "method": "DELETE",
+        "path":"/table?id="
       }
     ]
   },
   {
     "title":"Waiter",
-    "description": "Has full control of the system",
+    "description": "Can only order",
+    "organization_id" : 1,
     "permissions": [
-      {
-        "methods:":[
-          "GET", "PUT"
-        ],
-        "path":"/organization"
-      },
-      {
-        "methods:":[
-          "GET" 
-        ],
-        "path":"/branch"
-      },
-      {
-        "methods:":[
-          "GET"
-        ],
-        "path":"/hall"
-      },
-      {
-        "methods:":[
-          "GET", "POST", "PUT", "DELETE"
-        ],
-        "path":"/table"
-      }
+      [
+        {
+          "method": "GET",
+          "path":"/organization?id="
+        },
+        {
+          "method": "GET",
+          "path":"/branch?id="
+        },
+        {
+          "method": "GET",
+          "path":"/hall?id="
+        },
+        {
+          "method": "GET",
+          "path":"/table?id="
+        }
+      ]
     ]
   }
 ]
