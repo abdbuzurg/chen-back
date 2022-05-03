@@ -13,8 +13,8 @@ func (s *Server) BranchCRUDEndpoints() {
 	branchController := controller.NewBranchController(branchService)
 
 	branch := s.Router.Group("/branch", middleware.AuthMiddleware())
-	branch.GET("/", branchController.Find)
+	branch.GET("", branchController.Find)
 	branch.POST("", branchController.Create)
-	branch.PUT("/:id", branchController.Update)
-	branch.DELETE("/:id", branchController.Delete)
+	branch.PUT("", branchController.Update)
+	branch.DELETE("", branchController.Delete)
 }

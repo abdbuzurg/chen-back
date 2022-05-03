@@ -7,8 +7,7 @@ import (
 )
 
 type HallService interface {
-	FindAll() ([]model.Hall, error)
-	FindById(id int) (model.Hall, error)
+	Find(id int) ([]model.Hall, error)
 	Create(data dto.HallCreateDTO) error
 	Update(id int, data dto.HallUpdateDTO) error
 	Delete(id int) error
@@ -24,12 +23,13 @@ func NewHallService(repo repository.HallRepository) HallService {
 	}
 }
 
-func (hs hallService) FindAll() ([]model.Hall, error) {
-	return hs.hallRepository.FindAll()
-}
+func (hs hallService) Find(id int) ([]model.Hall, error) {
+	if id == 0 {
+		return hs.hallRepository.FindAll()
+	}
 
-func (hs hallService) FindById(id int) (model.Hall, error) {
-	return hs.hallRepository.FindById(id)
+	hall, err := hs.hallRepository.FindById(id)
+	return append([]model.Hall{}, hall), err
 }
 
 func (hs hallService) Create(data dto.HallCreateDTO) error {

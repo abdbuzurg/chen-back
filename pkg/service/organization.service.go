@@ -7,8 +7,7 @@ import (
 )
 
 type OrganizationService interface {
-	FindAll() ([]model.Organization, error)
-	FindById(id int) (model.Organization, error)
+	Find(id int) ([]model.Organization, error)
 	Create(data dto.OrganizationDTO) error
 	Update(id int, data dto.OrganizationDTO) error
 	Delete(id int) error
@@ -24,12 +23,13 @@ func NewOrganizationService(repo repository.OrganizationRepo) OrganizationServic
 	}
 }
 
-func (os organizationService) FindAll() ([]model.Organization, error) {
-	return os.organizationRepo.FindAll()
-}
+func (os organizationService) Find(id int) ([]model.Organization, error) {
+	if id == 0 {
+		return os.organizationRepo.FindAll()
+	}
 
-func (os organizationService) FindById(id int) (model.Organization, error) {
-	return os.organizationRepo.FindById(id)
+	organization, err := os.organizationRepo.FindById(id)
+	return append([]model.Organization{}, organization), err
 }
 func (os organizationService) Create(data dto.OrganizationDTO) error {
 	return os.organizationRepo.Create(data)

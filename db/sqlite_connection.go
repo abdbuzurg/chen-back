@@ -3,7 +3,6 @@ package db
 import (
 	"chen/db/migration"
 	"chen/model"
-	"fmt"
 	"log"
 
 	"github.com/gin-gonic/gin"
@@ -33,7 +32,7 @@ func NewSQLiteConnection() (SQLiteConnection, error) {
 
 	err = connection.autoUpdate()
 	if err != nil {
-		log.Fatal("could auto update tables")
+		log.Fatalf("could auto update tables: %v", err)
 		return connection, err
 	}
 
@@ -45,7 +44,7 @@ func (liteConn sqliteConnection) Get() *gorm.DB {
 }
 
 func (liteConn sqliteConnection) autoUpdate() error {
-	err := liteConn.db.AutoMigrate(
+	return liteConn.db.AutoMigrate(
 		&model.User{},
 		&model.Role{},
 		&model.Permission{},
@@ -57,11 +56,6 @@ func (liteConn sqliteConnection) autoUpdate() error {
 		&model.Order{},
 		&model.OrderList{},
 	)
-	if err != nil {
-		return err
-	}
-	fmt.Println("Auto update done")
-	return nil
 }
 
 func (liteConn sqliteConnection) InitialMigration(r *gin.Engine) error {

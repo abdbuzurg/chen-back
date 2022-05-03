@@ -26,38 +26,22 @@ func NewHallController(service service.HallService) HallController {
 		hallService: service,
 	}
 }
-func (hc hallController) Find(c *gin.Context) {
-	idRaw, exists := c.GetQuery("id")
-	if !exists {
-		response.FormatResponse(c, http.StatusBadRequest, "Invalid query parameters", false)
-		return
-	}
 
+func (hc hallController) Find(c *gin.Context) {
+	idRaw := c.DefaultQuery("id", "0")
 	id, err := strconv.Atoi(idRaw)
 	if err != nil {
 		response.FormatResponse(c, http.StatusBadRequest, "Invalid query parameters values", false)
 		return
 	}
 
-	if id == 0 {
-		halls, err := hc.hallService.FindAll()
-		if err != nil {
-			response.FormatResponse(c, http.StatusInternalServerError, "Could not get halls", false)
-			return
-		}
-
-		response.FormatResponse(c, http.StatusOK, halls, true)
-		return
-	}
-
-	hall, err := hc.hallService.FindById(id)
+	halls, err := hc.hallService.Find(id)
 	if err != nil {
 		response.FormatResponse(c, http.StatusInternalServerError, "Could not find", false)
 		return
 	}
 
-	response.FormatResponse(c, http.StatusOK, hall, true)
-
+	response.FormatResponse(c, http.StatusOK, halls, true)
 }
 
 func (hc hallController) Create(c *gin.Context) {

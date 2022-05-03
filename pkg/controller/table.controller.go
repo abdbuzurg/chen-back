@@ -40,18 +40,7 @@ func (tc tableController) Find(c *gin.Context) {
 		return
 	}
 
-	if id == 0 {
-		tables, err := tc.tableService.FindAll()
-		if err != nil {
-			response.FormatResponse(c, http.StatusInternalServerError, "Could not get tables", false)
-			return
-		}
-
-		response.FormatResponse(c, http.StatusOK, tables, true)
-		return
-	}
-
-	table, err := tc.tableService.FindById(id)
+	table, err := tc.tableService.Find(id)
 	if err != nil {
 		response.FormatResponse(c, http.StatusInternalServerError, "Could not find", false)
 		return

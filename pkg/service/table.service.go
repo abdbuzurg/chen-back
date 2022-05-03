@@ -7,8 +7,7 @@ import (
 )
 
 type TableService interface {
-	FindAll() ([]model.Table, error)
-	FindById(id int) (model.Table, error)
+	Find(id int) ([]model.Table, error)
 	Create(data dto.TableDTO) error
 	Update(id int, data dto.TableDTO) error
 	Delete(id int) error
@@ -24,12 +23,13 @@ func NewTableService(repo repository.TableRepository) TableService {
 	}
 }
 
-func (ts tableService) FindAll() ([]model.Table, error) {
-	return ts.tableRepository.FindAll()
-}
+func (ts tableService) Find(id int) ([]model.Table, error) {
+	if id == 0 {
+		return ts.tableRepository.FindAll()
+	}
 
-func (ts tableService) FindById(id int) (model.Table, error) {
-	return ts.tableRepository.FindById(id)
+	table, err := ts.tableRepository.FindById(id)
+	return append([]model.Table{}, table), err
 }
 
 func (ts tableService) Create(data dto.TableDTO) error {

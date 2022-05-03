@@ -7,8 +7,7 @@ import (
 )
 
 type BranchService interface {
-	FindAll() ([]model.Branch, error)
-	FindById(id int) (model.Branch, error)
+	Find(id int) ([]model.Branch, error)
 	Create(data dto.BranchCreateDTO) error
 	Update(id int, data dto.BranchUpdateDTO) error
 	Delete(id int) error
@@ -24,12 +23,13 @@ func NewBranchService(repo repository.BranchRepository) BranchService {
 	}
 }
 
-func (bs branchService) FindAll() ([]model.Branch, error) {
-	return bs.branchRepository.FindAll()
-}
+func (bs branchService) Find(id int) ([]model.Branch, error) {
+	if id == 0 {
+		return bs.branchRepository.FindAll()
+	}
 
-func (bs branchService) FindById(id int) (model.Branch, error) {
-	return bs.branchRepository.FindById(id)
+	branch, err := bs.branchRepository.FindById(id)
+	return append([]model.Branch{}, branch), err
 }
 
 func (bs branchService) Create(data dto.BranchCreateDTO) error {

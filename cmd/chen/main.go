@@ -16,10 +16,10 @@ func main() {
 
 	server := route.NewServer(SQLiteConnection.Get())
 
-	if err := SQLiteConnection.InitialMigration(server.Router); err != nil {
-		log.Fatal("could not make initial migration")
-		return
-	}
+	// if err := SQLiteConnection.InitialMigration(server.Router); err != nil {
+	// 	log.Fatal("could not make initial migration")
+	// 	return
+	// }
 
 	server.ServerListen()
 }

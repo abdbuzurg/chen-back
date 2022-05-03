@@ -28,38 +28,20 @@ func NewBranchController(service service.BranchService) BranchController {
 }
 
 func (bc branchController) Find(c *gin.Context) {
-	idRaw, exists := c.GetQuery("id")
-	if !exists {
-		response.FormatResponse(c, http.StatusBadRequest, "Invalid query parameters", false)
-		return
-	}
-
+	idRaw := c.DefaultQuery("id", "0")
 	id, err := strconv.Atoi(idRaw)
 	if err != nil {
 		response.FormatResponse(c, http.StatusBadRequest, "Invalid query parameters values", false)
 		return
 	}
 
-	if id == 0 {
-		// http://web.site/branch
-		branches, err := bc.branchService.FindAll()
-		if err != nil {
-			response.FormatResponse(c, http.StatusInternalServerError, "Could not get branches", false)
-			return
-		}
-
-		response.FormatResponse(c, http.StatusOK, branches, true)
-		return
-	}
-	// http://web.site/branch?id=1
-	branch, err := bc.branchService.FindById(id)
+	branches, err := bc.branchService.Find(id)
 	if err != nil {
-		response.FormatResponse(c, http.StatusInternalServerError, "Could not find Branch", false)
+		response.FormatResponse(c, http.StatusInternalServerError, "Could not get branches", false)
 		return
 	}
 
-	response.FormatResponse(c, http.StatusOK, branch, true)
-
+	response.FormatResponse(c, http.StatusOK, branches, true)
 }
 
 func (bc branchController) Create(c *gin.Context) {

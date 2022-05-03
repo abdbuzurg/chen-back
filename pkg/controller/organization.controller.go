@@ -27,35 +27,15 @@ func NewOrganizationController(service service.OrganizationService) Organization
 	}
 }
 
-func (oc organizationController) FindAll(c *gin.Context) {
-
-}
-
 func (oc organizationController) Find(c *gin.Context) {
-	idRaw, exists := c.GetQuery("id")
-	if !exists {
-		response.FormatResponse(c, http.StatusBadRequest, "Invalid query parameters", false)
-		return
-	}
-
+	idRaw := c.DefaultQuery("id", "0")
 	id, err := strconv.Atoi(idRaw)
 	if err != nil {
 		response.FormatResponse(c, http.StatusBadRequest, "Invalid query parameters values", false)
 		return
 	}
 
-	if id == 0 {
-		orgs, err := oc.organizationService.FindAll()
-		if err != nil {
-			response.FormatResponse(c, http.StatusInternalServerError, "could not fetch entries", false)
-			return
-		}
-
-		response.FormatResponse(c, http.StatusOK, orgs, true)
-		return
-	}
-
-	org, err := oc.organizationService.FindById(id)
+	org, err := oc.organizationService.Find(id)
 	if err != nil {
 		response.FormatResponse(c, http.StatusInternalServerError, err.Error(), false)
 		return
