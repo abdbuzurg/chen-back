@@ -1,8 +1,8 @@
 package repository
 
 import (
-	"chen/model"
 	"chen/pkg/dto"
+	"chen/pkg/model"
 	"time"
 
 	"gorm.io/gorm"
@@ -10,9 +10,9 @@ import (
 
 type TableRepository interface {
 	FindAll() ([]model.Table, error)
-	FindById(id int) (model.Table, error)
-	Create(data dto.TableDTO) error
-	Update(id int, data dto.TableDTO) error
+	FindByID(id int) (model.Table, error)
+	Create(data dto.Table) error
+	Update(id int, data dto.Table) error
 	Delete(id int) error
 }
 
@@ -21,7 +21,7 @@ type tableRepository struct {
 }
 
 func NewTableRepository(db *gorm.DB) TableRepository {
-	return tableRepository{
+	return &tableRepository{
 		db: db,
 	}
 }
@@ -33,13 +33,13 @@ func (tr tableRepository) FindAll() ([]model.Table, error) {
 	return tables, err
 }
 
-func (tr tableRepository) FindById(id int) (model.Table, error) {
+func (tr tableRepository) FindByID(id int) (model.Table, error) {
 	table := model.Table{}
 	err := tr.db.First(&table, "id = ?", id).Error
 	return table, err
 }
 
-func (tr tableRepository) Create(data dto.TableDTO) error {
+func (tr tableRepository) Create(data dto.Table) error {
 	table := model.Table{
 		X:      data.X,
 		Y:      data.Y,
@@ -50,7 +50,7 @@ func (tr tableRepository) Create(data dto.TableDTO) error {
 	return err
 }
 
-func (tr tableRepository) Update(id int, data dto.TableDTO) error {
+func (tr tableRepository) Update(id int, data dto.Table) error {
 	table := model.Table{}
 
 	err := tr.db.First(&table, "id = ?", id).Error

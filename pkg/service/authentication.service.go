@@ -3,28 +3,29 @@ package service
 import (
 	"chen/pkg/dto"
 	"chen/pkg/repository"
-	"chen/utils/token"
 	"errors"
 
 	"golang.org/x/crypto/bcrypt"
 )
 
 type AuthenticationService interface {
-	AuthRegister(registrationData dto.AuthenticationRegisterDTO) error
-	AuthLogin(loginData dto.AuthenticationLoginDTO) (string, error)
+	AuthRegister(registrationData dto.AuthenticationRegister) error
+	AuthLogin(loginData dto.AuthenticationLogin) (string, error)
 }
 
 type authenticationService struct {
 	authenticationRepository repository.AuthenticationRepository
+	jwtService               JWTService
 }
 
-func NewAuthenticationService(repo repository.AuthenticationRepository) AuthenticationService {
+func NewAuthenticationService(repo repository.AuthenticationRepository, jwtService JWTService) AuthenticationService {
 	return authenticationService{
 		authenticationRepository: repo,
+		jwtService:               jwtService,
 	}
 }
 
-func (as authenticationService) AuthRegister(registrationData dto.AuthenticationRegisterDTO) error {
+func (as authenticationService) AuthRegister(registrationData dto.AuthenticationRegister) error {
 	password, err := bcrypt.GenerateFromPassword([]byte(registrationData.Password), bcrypt.DefaultCost)
 	if err != nil {
 		return err
@@ -40,7 +41,7 @@ func (as authenticationService) AuthRegister(registrationData dto.Authentication
 	return nil
 }
 
-func (as authenticationService) AuthLogin(loginData dto.AuthenticationLoginDTO) (string, error) {
+func (as authenticationService) AuthLogin(loginData dto.AuthenticationLogin) (string, error) {
 	user, err := as.authenticationRepository.UserFindByUsername(loginData.Username)
 	if err != nil {
 		return "", errors.New("invalid credentials")
@@ -50,7 +51,7 @@ func (as authenticationService) AuthLogin(loginData dto.AuthenticationLoginDTO) 
 		return "", errors.New("invalid credentials")
 	}
 
-	token, err := token.GenerateToken(user.ID, user.RoleID)
+	token, err := as.jwtService.GenerateToken(user.ID, user.RoleID)
 	if err != nil {
 		return "", errors.New("could not sign in")
 	}

@@ -1,15 +1,16 @@
 package service
 
 import (
-	"chen/model"
 	"chen/pkg/dto"
+	"chen/pkg/model"
 	"chen/pkg/repository"
 )
 
 type HallService interface {
-	Find(id int) ([]model.Hall, error)
-	Create(data dto.HallCreateDTO) error
-	Update(id int, data dto.HallUpdateDTO) error
+	FindAll() ([]model.Hall, error)
+	FindByID(id int) (model.Hall, error)
+	Create(data dto.HallCreate) error
+	Update(id int, data dto.HallUpdate) error
 	Delete(id int) error
 }
 
@@ -18,25 +19,24 @@ type hallService struct {
 }
 
 func NewHallService(repo repository.HallRepository) HallService {
-	return hallService{
+	return &hallService{
 		hallRepository: repo,
 	}
 }
 
-func (hs hallService) Find(id int) ([]model.Hall, error) {
-	if id == 0 {
-		return hs.hallRepository.FindAll()
-	}
-
-	hall, err := hs.hallRepository.FindById(id)
-	return append([]model.Hall{}, hall), err
+func (hs hallService) FindAll() ([]model.Hall, error) {
+	return hs.hallRepository.FindAll()
 }
 
-func (hs hallService) Create(data dto.HallCreateDTO) error {
+func (hs hallService) FindByID(id int) (model.Hall, error) {
+	return hs.hallRepository.FindByID(id)
+}
+
+func (hs hallService) Create(data dto.HallCreate) error {
 	return hs.hallRepository.Create(data)
 }
 
-func (hs hallService) Update(id int, data dto.HallUpdateDTO) error {
+func (hs hallService) Update(id int, data dto.HallUpdate) error {
 	return hs.hallRepository.Update(id, data)
 }
 

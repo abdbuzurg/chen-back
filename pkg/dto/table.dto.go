@@ -1,6 +1,6 @@
 package dto
 
-type TableDTO struct {
+type Table struct {
 	X      float32 `json:"x"`
 	Y      float32 `json:"y"`
 	Number uint    `json:"number"`

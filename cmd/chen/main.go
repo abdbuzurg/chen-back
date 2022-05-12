@@ -2,7 +2,7 @@ package main
 
 import (
 	"chen/db"
-	"chen/route"
+	"chen/server"
 	"log"
 )
 
@@ -14,12 +14,12 @@ func main() {
 		return
 	}
 
-	server := route.NewServer(SQLiteConnection.Get())
+	server := server.NewServer(SQLiteConnection.Get())
 
 	// if err := SQLiteConnection.InitialMigration(server.Router); err != nil {
 	// 	log.Fatal("could not make initial migration")
 	// 	return
 	// }
 
-	server.ServerListen()
+	server.Listen()
 }

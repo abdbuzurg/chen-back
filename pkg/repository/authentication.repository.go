@@ -1,14 +1,14 @@
 package repository
 
 import (
-	"chen/model"
 	"chen/pkg/dto"
+	"chen/pkg/model"
 
 	"gorm.io/gorm"
 )
 
 type AuthenticationRepository interface {
-	Create(registrationData dto.AuthenticationRegisterDTO) error
+	Create(registrationData dto.AuthenticationRegister) error
 	UserFindByUsername(username string) (model.User, error)
 }
 
@@ -17,12 +17,12 @@ type authenticationRepository struct {
 }
 
 func NewAuthenticationRepository(db *gorm.DB) AuthenticationRepository {
-	return authenticationRepository{
+	return &authenticationRepository{
 		db: db,
 	}
 }
 
-func (ar authenticationRepository) Create(registrationData dto.AuthenticationRegisterDTO) error {
+func (ar authenticationRepository) Create(registrationData dto.AuthenticationRegister) error {
 	return ar.db.Create(&model.User{
 		Username:  registrationData.Username,
 		Password:  registrationData.Password,

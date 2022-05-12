@@ -1,8 +1,9 @@
 package middleware
 
 import (
-	"chen/utils/response"
-	"chen/utils/token"
+	"chen/pkg/service"
+	"errors"
+	"fmt"
 	"net/http"
 	"strings"
 
@@ -11,40 +12,45 @@ import (
 
 func AuthMiddleware() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		authHeader := c.GetHeader("Authorization")
-		if len(authHeader) == 0 {
-			message := "Authorization header is not provided"
-			response.FormatResponse(c, http.StatusUnauthorized, message, false)
-			c.Abort()
-			return
+		authMiddleware := func(c *gin.Context) (int, error) {
+
+			authHeader := c.GetHeader("Authorization")
+			if len(authHeader) == 0 {
+				return http.StatusUnauthorized, errors.New("authorization header is not provided")
+			}
+
+			fields := strings.Fields(authHeader)
+			if len(fields) < 2 {
+				return http.StatusUnauthorized, errors.New("invalid authorization header format")
+			}
+
+			authType := strings.ToLower(fields[0])
+			if authType != "bearer" {
+				return http.StatusUnauthorized, errors.New("unsupported authorization type")
+			}
+
+			accessToken := fields[1]
+			jwtService := service.NewJWTService()
+			payload, err := jwtService.VerifyToken(accessToken)
+			if err != nil {
+				return http.StatusUnauthorized, fmt.Errorf("invalid token: %v", err)
+			}
+
+			c.Set("payload", payload)
+
+			return http.StatusOK, nil
 		}
 
-		fields := strings.Fields(authHeader)
-		if len(fields) < 2 {
-			message := "Invalid authorization header format"
-			response.FormatResponse(c, http.StatusForbidden, message, false)
-			c.Abort()
-			return
-		}
-
-		authType := strings.ToLower(fields[0])
-		if authType != "bearer" {
-			message := "Unsupported authorization type"
-			response.FormatResponse(c, http.StatusForbidden, message, false)
-			c.Abort()
-			return
-		}
-
-		accessToken := fields[1]
-		payload, err := token.VerifyToken(accessToken)
+		status, err := authMiddleware(c)
 		if err != nil {
-			message := "Invalid token"
-			response.FormatResponse(c, http.StatusForbidden, message, false)
+			c.JSON(status, gin.H{
+				"data":    nil,
+				"error":   err.Error(),
+				"success": false,
+			})
 			c.Abort()
-			return
 		}
 
-		c.Set("payload", payload)
 		c.Next()
 	}
 }

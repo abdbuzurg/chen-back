@@ -1,15 +1,16 @@
 package service
 
 import (
-	"chen/model"
 	"chen/pkg/dto"
+	"chen/pkg/model"
 	"chen/pkg/repository"
 )
 
 type BranchService interface {
-	Find(id int) ([]model.Branch, error)
-	Create(data dto.BranchCreateDTO) error
-	Update(id int, data dto.BranchUpdateDTO) error
+	FindByID(id int) (model.Branch, error)
+	FindAll() ([]model.Branch, error)
+	Create(data dto.BranchCreate) error
+	Update(id int, data dto.BranchUpdate) error
 	Delete(id int) error
 }
 
@@ -18,25 +19,24 @@ type branchService struct {
 }
 
 func NewBranchService(repo repository.BranchRepository) BranchService {
-	return branchService{
+	return &branchService{
 		branchRepository: repo,
 	}
 }
 
-func (bs branchService) Find(id int) ([]model.Branch, error) {
-	if id == 0 {
-		return bs.branchRepository.FindAll()
-	}
-
-	branch, err := bs.branchRepository.FindById(id)
-	return append([]model.Branch{}, branch), err
+func (bs branchService) FindByID(id int) (model.Branch, error) {
+	return bs.branchRepository.FindByID(id)
 }
 
-func (bs branchService) Create(data dto.BranchCreateDTO) error {
+func (bs branchService) FindAll() ([]model.Branch, error) {
+	return bs.branchRepository.FindAll()
+}
+
+func (bs branchService) Create(data dto.BranchCreate) error {
 	return bs.branchRepository.Create(data)
 }
 
-func (bs branchService) Update(id int, data dto.BranchUpdateDTO) error {
+func (bs branchService) Update(id int, data dto.BranchUpdate) error {
 	return bs.branchRepository.Update(id, data)
 }
 

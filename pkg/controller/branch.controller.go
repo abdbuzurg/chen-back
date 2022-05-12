@@ -3,7 +3,8 @@ package controller
 import (
 	"chen/pkg/dto"
 	"chen/pkg/service"
-	"chen/utils/response"
+	"errors"
+	"fmt"
 	"net/http"
 	"strconv"
 
@@ -11,10 +12,11 @@ import (
 )
 
 type BranchController interface {
-	Find(c *gin.Context)
-	Create(c *gin.Context)
-	Update(c *gin.Context)
-	Delete(c *gin.Context)
+	FindByID(c *gin.Context) (int, interface{}, bool, error)
+	FindAll(c *gin.Context) (int, interface{}, bool, error)
+	Create(c *gin.Context) (int, interface{}, bool, error)
+	Update(c *gin.Context) (int, interface{}, bool, error)
+	Delete(c *gin.Context) (int, interface{}, bool, error)
 }
 
 type branchController struct {
@@ -27,82 +29,73 @@ func NewBranchController(service service.BranchService) BranchController {
 	}
 }
 
-func (bc branchController) Find(c *gin.Context) {
-	idRaw := c.DefaultQuery("id", "0")
-	id, err := strconv.Atoi(idRaw)
+func (bc branchController) FindAll(c *gin.Context) (int, interface{}, bool, error) {
+	branches, err := bc.branchService.FindAll()
 	if err != nil {
-		response.FormatResponse(c, http.StatusBadRequest, "Invalid query parameters values", false)
-		return
+		return http.StatusInternalServerError, nil, false, fmt.Errorf("could not find %v", err)
 	}
 
-	branches, err := bc.branchService.Find(id)
-	if err != nil {
-		response.FormatResponse(c, http.StatusInternalServerError, "Could not get branches", false)
-		return
-	}
-
-	response.FormatResponse(c, http.StatusOK, branches, true)
+	return http.StatusOK, branches, true, nil
 }
 
-func (bc branchController) Create(c *gin.Context) {
-	dataForNewBranch := dto.BranchCreateDTO{}
+func (bc branchController) FindByID(c *gin.Context) (int, interface{}, bool, error) {
+	idRaw := c.Param("id")
+	id, err := strconv.Atoi(idRaw)
+	if err != nil {
+		return http.StatusBadRequest, nil, false, errors.New("invalid url parameters values")
+	}
+
+	branch, err := bc.branchService.FindByID(id)
+	if err != nil {
+		return http.StatusInternalServerError, nil, false, fmt.Errorf("could not get branches: %v", err)
+	}
+
+	return http.StatusOK, branch, true, nil
+}
+
+func (bc branchController) Create(c *gin.Context) (int, interface{}, bool, error) {
+	dataForNewBranch := dto.BranchCreate{}
 	if err := c.ShouldBindJSON(&dataForNewBranch); err != nil {
-		response.FormatResponse(c, http.StatusBadRequest, "Invalid Body", false)
-		return
+		return http.StatusBadRequest, nil, false, errors.New("invalid Body")
 	}
 
 	err := bc.branchService.Create(dataForNewBranch)
 	if err != nil {
-		response.FormatResponse(c, http.StatusInternalServerError, "Could not create", false)
-		return
+		return http.StatusInternalServerError, nil, false, fmt.Errorf("could not create: %v", err)
 	}
 
-	response.FormatResponse(c, http.StatusOK, "Created", true)
+	return http.StatusOK, "Created", true, nil
 }
 
-func (bc branchController) Update(c *gin.Context) {
-	idRaw, exists := c.GetQuery("id")
-	if !exists {
-		response.FormatResponse(c, http.StatusBadRequest, "Invalid query parameters", false)
-		return
-	}
+func (bc branchController) Update(c *gin.Context) (int, interface{}, bool, error) {
+	idRaw := c.Param("id")
 	id, err := strconv.Atoi(idRaw)
 	if err != nil {
-		response.FormatResponse(c, http.StatusBadRequest, "Invalid Parameters", false)
-		return
+		return http.StatusBadRequest, nil, false, errors.New("invalid query parameters values")
 	}
 
-	dataForNewBranch := dto.BranchUpdateDTO{}
+	dataForNewBranch := dto.BranchUpdate{}
 	if err := c.ShouldBindJSON(&dataForNewBranch); err != nil {
-		response.FormatResponse(c, http.StatusBadRequest, "Invalid Body", false)
-		return
+		return http.StatusBadRequest, nil, false, errors.New("invalid Body")
 	}
 
 	err = bc.branchService.Update(id, dataForNewBranch)
 	if err != nil {
-		response.FormatResponse(c, http.StatusInternalServerError, "Could not update", false)
-		return
+		return http.StatusInternalServerError, nil, false, fmt.Errorf("could not update: %v", err)
 	}
 
-	response.FormatResponse(c, http.StatusOK, "Updated", true)
+	return http.StatusOK, "Updated", true, nil
 }
 
-func (bc branchController) Delete(c *gin.Context) {
-	idRaw, exists := c.GetQuery("id")
-	if !exists {
-		response.FormatResponse(c, http.StatusBadRequest, "Invalid query parameters", false)
-		return
-	}
+func (bc branchController) Delete(c *gin.Context) (int, interface{}, bool, error) {
+	idRaw := c.Param("id")
 	id, err := strconv.Atoi(idRaw)
 	if err != nil {
-		response.FormatResponse(c, http.StatusBadRequest, "Invalid Parameters", false)
-		return
+		return http.StatusBadRequest, nil, false, errors.New("invalid query parameters values")
 	}
-
 	err = bc.branchService.Delete(id)
 	if err != nil {
-		response.FormatResponse(c, http.StatusInternalServerError, "Could not delete", false)
-		return
+		return http.StatusInternalServerError, nil, false, fmt.Errorf("could not delete: %v", err)
 	}
-	response.FormatResponse(c, http.StatusOK, "Deleted", true)
+	return http.StatusInternalServerError, "Deleted", true, nil
 }

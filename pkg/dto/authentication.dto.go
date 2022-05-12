@@ -1,6 +1,6 @@
 package dto
 
-type AuthenticationRegisterDTO struct {
+type AuthenticationRegister struct {
 	Username  string `json:"username" binding:"required"`
 	Password  string `json:"password" binding:"required"`
 	Firstname string `json:"firstname" binding:"required"`
@@ -8,7 +8,7 @@ type AuthenticationRegisterDTO struct {
 	RoleID    uint   `json:"role_id" binding:"required"`
 }
 
-type AuthenticationLoginDTO struct {
+type AuthenticationLogin struct {
 	Username string `json:"username" binding:"required"`
 	Password string `json:"password" binding:"required"`
 }

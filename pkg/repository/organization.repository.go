@@ -1,17 +1,17 @@
 package repository
 
 import (
-	"chen/model"
 	"chen/pkg/dto"
+	"chen/pkg/model"
 
 	"gorm.io/gorm"
 )
 
 type OrganizationRepo interface {
 	FindAll() ([]model.Organization, error)
-	FindById(id int) (model.Organization, error)
-	Create(data dto.OrganizationDTO) error
-	Update(id int, data dto.OrganizationDTO) error
+	FindByID(id int) (model.Organization, error)
+	Create(data dto.Organization) error
+	Update(id int, data dto.Organization) error
 	Delete(id int) error
 }
 
@@ -20,7 +20,7 @@ type organizationRepo struct {
 }
 
 func NewOrganizationRepo(db *gorm.DB) OrganizationRepo {
-	return organizationRepo{
+	return &organizationRepo{
 		db: db,
 	}
 }
@@ -31,20 +31,20 @@ func (or organizationRepo) FindAll() ([]model.Organization, error) {
 	return orgs, err
 }
 
-func (or organizationRepo) FindById(id int) (model.Organization, error) {
+func (or organizationRepo) FindByID(id int) (model.Organization, error) {
 	org := model.Organization{}
 	err := or.db.First(&org, "id = ?", id).Error
 	return org, err
 }
 
-func (or organizationRepo) Create(data dto.OrganizationDTO) error {
+func (or organizationRepo) Create(data dto.Organization) error {
 	return or.db.Create(&model.Organization{
 		Name:     data.Name,
 		IsActive: data.IsActive,
 	}).Error
 }
 
-func (or organizationRepo) Update(id int, data dto.OrganizationDTO) error {
+func (or organizationRepo) Update(id int, data dto.Organization) error {
 
 	org := model.Organization{}
 	err := or.db.First(&org, "id = ?", id).Error

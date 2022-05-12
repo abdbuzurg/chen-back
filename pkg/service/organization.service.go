@@ -1,15 +1,16 @@
 package service
 
 import (
-	"chen/model"
 	"chen/pkg/dto"
+	"chen/pkg/model"
 	"chen/pkg/repository"
 )
 
 type OrganizationService interface {
-	Find(id int) ([]model.Organization, error)
-	Create(data dto.OrganizationDTO) error
-	Update(id int, data dto.OrganizationDTO) error
+	FindAll() ([]model.Organization, error)
+	FindByID(id int) (model.Organization, error)
+	Create(data dto.Organization) error
+	Update(id int, data dto.Organization) error
 	Delete(id int) error
 }
 
@@ -18,23 +19,23 @@ type organizationService struct {
 }
 
 func NewOrganizationService(repo repository.OrganizationRepo) OrganizationService {
-	return organizationService{
+	return &organizationService{
 		organizationRepo: repo,
 	}
 }
 
-func (os organizationService) Find(id int) ([]model.Organization, error) {
-	if id == 0 {
-		return os.organizationRepo.FindAll()
-	}
-
-	organization, err := os.organizationRepo.FindById(id)
-	return append([]model.Organization{}, organization), err
+func (os organizationService) FindByID(id int) (model.Organization, error) {
+	return os.organizationRepo.FindByID(id)
 }
-func (os organizationService) Create(data dto.OrganizationDTO) error {
+
+func (os organizationService) FindAll() ([]model.Organization, error) {
+	return os.organizationRepo.FindAll()
+}
+
+func (os organizationService) Create(data dto.Organization) error {
 	return os.organizationRepo.Create(data)
 }
-func (os organizationService) Update(id int, data dto.OrganizationDTO) error {
+func (os organizationService) Update(id int, data dto.Organization) error {
 	return os.organizationRepo.Update(id, data)
 }
 func (os organizationService) Delete(id int) error {

@@ -1,18 +1,16 @@
 package db
 
 import (
-	"chen/db/migration"
-	"chen/model"
+	"chen/pkg/model"
 	"log"
 
-	"github.com/gin-gonic/gin"
 	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
 )
 
 type SQLiteConnection interface {
 	Get() *gorm.DB
-	InitialMigration(r *gin.Engine) error
+	//InitialMigration(r *gin.Engine) error
 	autoUpdate() error
 }
 
@@ -58,6 +56,6 @@ func (liteConn sqliteConnection) autoUpdate() error {
 	)
 }
 
-func (liteConn sqliteConnection) InitialMigration(r *gin.Engine) error {
-	return migration.InitialMigration(r, liteConn.db)
-}
+// func (liteConn sqliteConnection) InitialMigration(r *gin.Engine) error {
+// 	return migration.InitialMigration(r, liteConn.db)
+// }

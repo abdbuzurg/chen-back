@@ -1,17 +1,17 @@
 package repository
 
 import (
-	"chen/model"
 	"chen/pkg/dto"
+	"chen/pkg/model"
 
 	"gorm.io/gorm"
 )
 
 type BranchRepository interface {
 	FindAll() ([]model.Branch, error)
-	FindById(id int) (model.Branch, error)
-	Create(data dto.BranchCreateDTO) error
-	Update(id int, data dto.BranchUpdateDTO) error
+	FindByID(id int) (model.Branch, error)
+	Create(data dto.BranchCreate) error
+	Update(id int, data dto.BranchUpdate) error
 	Delete(id int) error
 }
 
@@ -20,7 +20,7 @@ type branchRepositry struct {
 }
 
 func NewBranchRepository(db *gorm.DB) BranchRepository {
-	return branchRepositry{
+	return &branchRepositry{
 		db: db,
 	}
 }
@@ -31,14 +31,14 @@ func (br branchRepositry) FindAll() ([]model.Branch, error) {
 	return orgs, err
 }
 
-func (br branchRepositry) FindById(id int) (model.Branch, error) {
+func (br branchRepositry) FindByID(id int) (model.Branch, error) {
 	branch := model.Branch{}
 	err := br.db.First(&branch, "id = ?", id).Error
 
 	return branch, err
 }
 
-func (br branchRepositry) Create(data dto.BranchCreateDTO) error {
+func (br branchRepositry) Create(data dto.BranchCreate) error {
 	return br.db.Create(&model.Branch{
 		OrganizationID: data.OrganizationID,
 		Name:           data.Name,
@@ -46,7 +46,7 @@ func (br branchRepositry) Create(data dto.BranchCreateDTO) error {
 	}).Error
 }
 
-func (br branchRepositry) Update(id int, data dto.BranchUpdateDTO) error {
+func (br branchRepositry) Update(id int, data dto.BranchUpdate) error {
 	branch := model.Branch{}
 	err := br.db.First(branch, "id = ?", id).Error
 	if err != nil {

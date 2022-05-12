@@ -1,10 +1,10 @@
 package dto
 
-type HallCreateDTO struct {
+type HallCreate struct {
 	Name     string `json:"name" binding:"required"`
 	BranchID uint   `json:"branch_id" binding:"required"`
 }
 
-type HallUpdateDTO struct {
+type HallUpdate struct {
 	Name string `json:"name" binding:"required"`
 }

@@ -1,18 +1,19 @@
 package controller
 
 import (
+	"errors"
+	"fmt"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
 
 	"chen/pkg/dto"
 	"chen/pkg/service"
-	"chen/utils/response"
 )
 
 type AuthentificationController interface {
-	Register(c *gin.Context)
-	Login(c *gin.Context)
+	Register(c *gin.Context) (int, interface{}, bool, error)
+	Login(c *gin.Context) (int, interface{}, bool, error)
 }
 
 type authentificationController struct {
@@ -25,36 +26,30 @@ func NewAuthenticationController(service service.AuthenticationService) Authenti
 	}
 }
 
-func (ac authentificationController) Register(c *gin.Context) {
-	var dataForRegistration dto.AuthenticationRegisterDTO
+func (ac authentificationController) Register(c *gin.Context) (int, interface{}, bool, error) {
+	var dataForRegistration dto.AuthenticationRegister
 	if err := c.ShouldBindJSON(&dataForRegistration); err != nil {
-		response.FormatResponse(c, http.StatusBadRequest, "Invalid Data Format", false)
-		return
+		return http.StatusBadRequest, nil, false, errors.New("invalid body")
 	}
 
 	err := ac.authenticationService.AuthRegister(dataForRegistration)
 	if err != nil {
-		response.FormatResponse(c, http.StatusInternalServerError, "Server Cannot handle your requests", false)
-		return
+		return http.StatusInternalServerError, nil, false, fmt.Errorf("could not register: %v", err)
 	}
 
-	response.FormatResponse(c, http.StatusOK, "You have been registered", true)
+	return http.StatusOK, "You have been registered", true, nil
 }
 
-func (ac authentificationController) Login(c *gin.Context) {
-	dataForLogin := dto.AuthenticationLoginDTO{}
+func (ac authentificationController) Login(c *gin.Context) (int, interface{}, bool, error) {
+	dataForLogin := dto.AuthenticationLogin{}
 	if err := c.ShouldBindJSON(&dataForLogin); err != nil {
-		response.FormatResponse(c, http.StatusBadRequest, "Invalid Data Format", false)
-		return
+		return http.StatusBadRequest, nil, false, errors.New("invalid Data Format")
 	}
 
 	token, err := ac.authenticationService.AuthLogin(dataForLogin)
 	if err != nil {
-		response.FormatResponse(c, http.StatusInternalServerError, err.Error(), false)
-		return
+		return http.StatusInternalServerError, nil, false, fmt.Errorf("could not log in: %v", err)
 	}
 
-	response.FormatResponse(c, http.StatusOK, gin.H{
-		"token": token,
-	}, true)
+	return http.StatusOK, gin.H{"token": token}, true, nil
 }

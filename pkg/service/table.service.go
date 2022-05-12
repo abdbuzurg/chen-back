@@ -1,15 +1,16 @@
 package service
 
 import (
-	"chen/model"
 	"chen/pkg/dto"
+	"chen/pkg/model"
 	"chen/pkg/repository"
 )
 
 type TableService interface {
-	Find(id int) ([]model.Table, error)
-	Create(data dto.TableDTO) error
-	Update(id int, data dto.TableDTO) error
+	FindByID(id int) (model.Table, error)
+	FindAll() ([]model.Table, error)
+	Create(data dto.Table) error
+	Update(id int, data dto.Table) error
 	Delete(id int) error
 }
 
@@ -18,25 +19,24 @@ type tableService struct {
 }
 
 func NewTableService(repo repository.TableRepository) TableService {
-	return tableService{
+	return &tableService{
 		tableRepository: repo,
 	}
 }
 
-func (ts tableService) Find(id int) ([]model.Table, error) {
-	if id == 0 {
-		return ts.tableRepository.FindAll()
-	}
-
-	table, err := ts.tableRepository.FindById(id)
-	return append([]model.Table{}, table), err
+func (ts tableService) FindAll() ([]model.Table, error) {
+	return ts.tableRepository.FindAll()
 }
 
-func (ts tableService) Create(data dto.TableDTO) error {
+func (ts tableService) FindByID(id int) (model.Table, error) {
+	return ts.tableRepository.FindByID(id)
+}
+
+func (ts tableService) Create(data dto.Table) error {
 	return ts.tableRepository.Create(data)
 }
 
-func (ts tableService) Update(id int, data dto.TableDTO) error {
+func (ts tableService) Update(id int, data dto.Table) error {
 	return ts.tableRepository.Update(id, data)
 }
 

@@ -3,7 +3,8 @@ package controller
 import (
 	"chen/pkg/dto"
 	"chen/pkg/service"
-	"chen/utils/response"
+	"errors"
+	"fmt"
 	"net/http"
 	"strconv"
 
@@ -11,10 +12,11 @@ import (
 )
 
 type OrganizationController interface {
-	Find(c *gin.Context)
-	Create(c *gin.Context)
-	Update(c *gin.Context)
-	Delete(c *gin.Context)
+	FindAll(c *gin.Context) (int, interface{}, bool, error)
+	FindByID(c *gin.Context) (int, interface{}, bool, error)
+	Create(c *gin.Context) (int, interface{}, bool, error)
+	Update(c *gin.Context) (int, interface{}, bool, error)
+	Delete(c *gin.Context) (int, interface{}, bool, error)
 }
 
 type organizationController struct {
@@ -27,80 +29,74 @@ func NewOrganizationController(service service.OrganizationService) Organization
 	}
 }
 
-func (oc organizationController) Find(c *gin.Context) {
-	idRaw := c.DefaultQuery("id", "0")
-	id, err := strconv.Atoi(idRaw)
+func (oc organizationController) FindAll(c *gin.Context) (int, interface{}, bool, error) {
+	organizations, err := oc.organizationService.FindAll()
 	if err != nil {
-		response.FormatResponse(c, http.StatusBadRequest, "Invalid query parameters values", false)
-		return
+		return http.StatusInternalServerError, nil, false, fmt.Errorf("could not get: %v", err)
 	}
 
-	org, err := oc.organizationService.Find(id)
-	if err != nil {
-		response.FormatResponse(c, http.StatusInternalServerError, err.Error(), false)
-		return
-	}
-
-	response.FormatResponse(c, http.StatusOK, org, true)
+	return http.StatusOK, organizations, true, nil
 }
 
-func (oc organizationController) Create(c *gin.Context) {
-	var dataForCreatingNewOrg dto.OrganizationDTO
+func (oc organizationController) FindByID(c *gin.Context) (int, interface{}, bool, error) {
+	idRaw := c.Param("id")
+	id, err := strconv.Atoi(idRaw)
+	if err != nil {
+		return http.StatusBadRequest, nil, false, errors.New("invalid url parameters values")
+	}
+
+	org, err := oc.organizationService.FindByID(id)
+	if err != nil {
+		return http.StatusInternalServerError, nil, false, fmt.Errorf("could not get branches: %v", err)
+	}
+
+	return http.StatusOK, org, true, nil
+}
+
+func (oc organizationController) Create(c *gin.Context) (int, interface{}, bool, error) {
+	var dataForCreatingNewOrg dto.Organization
 	if err := c.ShouldBindJSON(&dataForCreatingNewOrg); err != nil {
-		response.FormatResponse(c, http.StatusBadRequest, "Invalid Body", false)
-		return
+		return http.StatusBadRequest, nil, false, errors.New("invalid Body")
 	}
 	err := oc.organizationService.Create(dataForCreatingNewOrg)
 
 	if err != nil {
-		response.FormatResponse(c, http.StatusInternalServerError, "Could not create ORG", false)
-		return
+		return http.StatusInternalServerError, nil, false, fmt.Errorf("could not create: %v", err)
 	}
 
-	response.FormatResponse(c, http.StatusOK, "New Org is created", true)
+	return http.StatusOK, "Created", true, nil
 }
 
-func (oc organizationController) Update(c *gin.Context) {
-	idRaw, exists := c.GetQuery("id")
-	if !exists {
-		response.FormatResponse(c, http.StatusBadRequest, "Invalid query parameters", false)
-		return
-	}
+func (oc organizationController) Update(c *gin.Context) (int, interface{}, bool, error) {
+	idRaw := c.Param("id")
 	id, err := strconv.Atoi(idRaw)
 	if err != nil {
-		response.FormatResponse(c, http.StatusBadRequest, "Invalid parameters", false)
-		return
+		return http.StatusBadRequest, nil, false, errors.New("invalid query parameters values")
 	}
 
-	var dataForUpdaingOrgInfo dto.OrganizationDTO
+	var dataForUpdaingOrgInfo dto.Organization
 	if err := c.ShouldBindJSON(&dataForUpdaingOrgInfo); err != nil {
-		response.FormatResponse(c, http.StatusBadRequest, "Invalid Body", false)
-		return
+		return http.StatusBadRequest, nil, false, errors.New("invalid Body")
 	}
+
 	err = oc.organizationService.Update(id, dataForUpdaingOrgInfo)
 	if err != nil {
-		response.FormatResponse(c, http.StatusInternalServerError, "Cannot update Org Info", false)
-		return
+		return http.StatusInternalServerError, nil, false, fmt.Errorf("could not update: %v", err)
 	}
 
-	response.FormatResponse(c, http.StatusOK, "Info updated successfully", true)
+	return http.StatusOK, "Updated", true, nil
 }
-func (oc organizationController) Delete(c *gin.Context) {
-	idRaw, exists := c.GetQuery("id")
-	if !exists {
-		response.FormatResponse(c, http.StatusBadRequest, "Invalid query parameters", false)
-		return
-	}
+func (oc organizationController) Delete(c *gin.Context) (int, interface{}, bool, error) {
+	idRaw := c.Param("id")
 	id, err := strconv.Atoi(idRaw)
 	if err != nil {
-		response.FormatResponse(c, http.StatusBadRequest, "Invalid parameters", false)
-		return
+		return http.StatusBadRequest, nil, false, errors.New("invalid query parameters values")
 	}
 
 	err = oc.organizationService.Delete(id)
 	if err != nil {
-		response.FormatResponse(c, http.StatusInternalServerError, "Could not delete org", false)
+		return http.StatusInternalServerError, nil, false, fmt.Errorf("could not delete: %v", err)
 	}
 
-	response.FormatResponse(c, http.StatusOK, "Successfully Deleted", true)
+	return http.StatusInternalServerError, "Deleted", true, nil
 }

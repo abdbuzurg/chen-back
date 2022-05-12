@@ -3,7 +3,8 @@ package controller
 import (
 	"chen/pkg/dto"
 	"chen/pkg/service"
-	"chen/utils/response"
+	"errors"
+	"fmt"
 	"net/http"
 	"strconv"
 
@@ -11,10 +12,11 @@ import (
 )
 
 type HallController interface {
-	Find(c *gin.Context)
-	Create(c *gin.Context)
-	Update(c *gin.Context)
-	Delete(c *gin.Context)
+	FindAll(c *gin.Context) (int, interface{}, bool, error)
+	FindByID(c *gin.Context) (int, interface{}, bool, error)
+	Create(c *gin.Context) (int, interface{}, bool, error)
+	Update(c *gin.Context) (int, interface{}, bool, error)
+	Delete(c *gin.Context) (int, interface{}, bool, error)
 }
 
 type hallController struct {
@@ -27,83 +29,77 @@ func NewHallController(service service.HallService) HallController {
 	}
 }
 
-func (hc hallController) Find(c *gin.Context) {
-	idRaw := c.DefaultQuery("id", "0")
-	id, err := strconv.Atoi(idRaw)
+func (hc hallController) FindAll(c *gin.Context) (int, interface{}, bool, error) {
+	halls, err := hc.hallService.FindAll()
 	if err != nil {
-		response.FormatResponse(c, http.StatusBadRequest, "Invalid query parameters values", false)
-		return
+		return http.StatusInternalServerError, nil, false, fmt.Errorf("could not get: %v", err)
 	}
 
-	halls, err := hc.hallService.Find(id)
-	if err != nil {
-		response.FormatResponse(c, http.StatusInternalServerError, "Could not find", false)
-		return
-	}
-
-	response.FormatResponse(c, http.StatusOK, halls, true)
+	return http.StatusOK, halls, true, nil
 }
 
-func (hc hallController) Create(c *gin.Context) {
-	dataForNewHall := dto.HallCreateDTO{}
+func (hc hallController) FindByID(c *gin.Context) (int, interface{}, bool, error) {
+	idRaw := c.Param("id")
+	id, err := strconv.Atoi(idRaw)
+	if err != nil {
+		return http.StatusBadRequest, nil, false, errors.New("invalid query parameters values")
+	}
+
+	hall, err := hc.hallService.FindByID(id)
+	if err != nil {
+		return http.StatusInternalServerError, nil, false, fmt.Errorf("could not get: %v", err)
+	}
+
+	return http.StatusOK, hall, true, nil
+}
+
+func (hc hallController) Create(c *gin.Context) (int, interface{}, bool, error) {
+	dataForNewHall := dto.HallCreate{}
 	if err := c.ShouldBindJSON(&dataForNewHall); err != nil {
-		response.FormatResponse(c, http.StatusBadRequest, "Invalid body", false)
-		return
+		return http.StatusBadRequest, nil, false, errors.New("invalid Body")
 	}
 
 	err := hc.hallService.Create(dataForNewHall)
 	if err != nil {
-		response.FormatResponse(c, http.StatusInternalServerError, "Could not create", false)
-		return
+		return http.StatusInternalServerError, nil, false, fmt.Errorf("could not create: %v", err)
 	}
 
-	response.FormatResponse(c, http.StatusOK, "Created", true)
+	return http.StatusOK, "Created", true, nil
 }
 
-func (hc hallController) Update(c *gin.Context) {
-	idRaw, exists := c.GetQuery("id")
-	if !exists {
-		response.FormatResponse(c, http.StatusBadRequest, "Invalid query parameters", false)
-		return
-	}
+func (hc hallController) Update(c *gin.Context) (int, interface{}, bool, error) {
+	idRaw := c.Param("id")
 	id, err := strconv.Atoi(idRaw)
 	if err != nil {
-		response.FormatResponse(c, http.StatusBadRequest, "Invalid Parameters", false)
-		return
+		return http.StatusBadRequest, nil, false, errors.New("invalid query parameters values")
 	}
 
-	dataToUpdateHall := dto.HallUpdateDTO{}
+	dataToUpdateHall := dto.HallUpdate{}
 	if err := c.ShouldBindJSON(&dataToUpdateHall); err != nil {
-		response.FormatResponse(c, http.StatusBadRequest, "Invalid body", false)
-		return
+		return http.StatusBadRequest, nil, false, errors.New("invalid Body")
 	}
 
 	err = hc.hallService.Update(id, dataToUpdateHall)
 	if err != nil {
-		response.FormatResponse(c, http.StatusInternalServerError, "Could not update", false)
-		return
+		return http.StatusInternalServerError, nil, false, fmt.Errorf("could not update: %v", err)
 	}
 
-	response.FormatResponse(c, http.StatusOK, "Updated", true)
+	return http.StatusOK, "Updated", true, nil
+
 }
 
-func (hc hallController) Delete(c *gin.Context) {
-	idRaw, exists := c.GetQuery("id")
-	if !exists {
-		response.FormatResponse(c, http.StatusBadRequest, "Invalid query parameters", false)
-		return
-	}
+func (hc hallController) Delete(c *gin.Context) (int, interface{}, bool, error) {
+	idRaw := c.Param("id")
+
 	id, err := strconv.Atoi(idRaw)
 	if err != nil {
-		response.FormatResponse(c, http.StatusBadRequest, "Invalid Parameters", false)
-		return
+		return http.StatusBadRequest, nil, false, errors.New("invalid query parameters values")
 	}
 
 	err = hc.hallService.Delete(id)
 	if err != nil {
-		response.FormatResponse(c, http.StatusInternalServerError, "Could not delete", false)
-		return
+		return http.StatusInternalServerError, nil, false, fmt.Errorf("could not delete: %v", err)
 	}
 
-	response.FormatResponse(c, http.StatusOK, "Deleted", true)
+	return http.StatusInternalServerError, "Deleted", true, nil
 }
